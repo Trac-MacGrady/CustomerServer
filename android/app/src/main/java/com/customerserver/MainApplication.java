@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.customerserver.customer.CustomerSetPackage;
 import com.customerserver.customer.DealMessagePackage;
-import com.facebook.react.BuildConfig;
 import com.facebook.react.ReactApplication;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.facebook.react.ReactNativeHost;

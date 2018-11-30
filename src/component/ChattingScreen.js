@@ -21,14 +21,19 @@ import {
   Text,
   View,
   ToastAndroid,
-  DeviceEventEmitter
+  DeviceEventEmitter, TouchableOpacity, TextInput, Button
 } from 'react-native'
 import NativeDealMessage from '../native/NativeDealMessage'
 import NativeCustomerServerSet from '../native/NativeCustomerServerSet'
 import ZoomImage from '../widget/ZoomImage'
+import EmotionsView from '../widget/moji/EmotionsView'
+import { EMOTIONS_DATA, EMOTIONS_ZHCN, invertKeyValues } from '../widget/moji/DataSource'
 
 const {width} = Dimensions.get('window');
 const MSG_LINE_MAX_COUNT = 15;
+const BAR_STATE_SHOW_KEYBOARD = 1;
+const BAR_STATE_SHOW_RECORDER = 2;
+let emojiReg = new RegExp('\\[[^\\]]+\\]','g'); //表情符号正则表达式
 
 export default class ChattingScreen extends Component {
   constructor(props) {
@@ -40,7 +45,11 @@ export default class ChattingScreen extends Component {
       isSessionStarted: false,
       conversation: null,
       isLoginServer:'',
-      messagessss: []
+      messagessss: [],
+      tempSendTxtArray:[],
+      cursorIndex:0,
+      barState: BAR_STATE_SHOW_KEYBOARD,
+      inputMsg: ''
     };
 
     ConversationUtil.getConversations("hongwang", (data) => {
@@ -138,7 +147,28 @@ export default class ChattingScreen extends Component {
   }
 
   handleSendBtnClick = (msg) => {
-    this.sendTextMessage(msg);
+
+    console.log("msg: " + msg);
+    this.setState({
+      tempSendTxtArray:[],
+    });
+
+    let finalMsg = '';
+    if (this.state.inputMsg !== '' && this.state.inputMsg.length > 0) {
+      this._matchContentString(this.state.inputMsg);
+      console.log("this.state.tempSendTxtArray: " + this.state.tempSendTxtArray.toString());
+      console.log("this.state.tempSendTxtArray.length: " + this.state.tempSendTxtArray.length);
+      for (let i = 0; i < this.state.tempSendTxtArray.length; i++){
+        finalMsg += this.state.tempSendTxtArray[i];
+      }
+
+      this._onInputChangeText('');
+      this.sendTextMessage(finalMsg);
+    }
+
+
+    // this.sendTextMessage(msg);
+    // this.setState({inputMsg: ''});
   }
 
   sendTextMessage = async (msg) =>{ // 发送文本消息
@@ -176,12 +206,7 @@ export default class ChattingScreen extends Component {
       'messageType': 'image'
     })
   }
-
-  sendMojiMessage = async (moji) => {
-    console.log("moji: " + moji);
-    this.setState({inputMsg: moji});
-  }
-
+  
   scroll() {
     this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 0);
   }
@@ -209,6 +234,54 @@ export default class ChattingScreen extends Component {
         CountEmitter.emit('notifyConversationListRefresh');
       })
     }
+  }
+
+  _matchContentString(textContent){
+
+    console.log("textContext: " + textContent);
+    // 匹配得到index并放入数组中
+    let currentTextLength = textContent.length;
+
+    let emojiIndex = textContent.search(emojiReg);
+
+    let checkIndexArray = [];
+    console.log("emojiIndex: " + emojiIndex);
+    // 若匹配不到，则直接返回一个全文本
+    if (emojiIndex === -1) {
+
+      this.state.tempSendTxtArray.push(textContent.substring(0,currentTextLength));
+
+    } else {
+
+      if (emojiIndex !== -1) {
+        checkIndexArray.push(emojiIndex);
+      }
+
+      // 取index最小者
+      console.log("111111111111111111111111");
+      let minIndex = Math.min(...checkIndexArray);
+      console.log("2222222222222222222222222");
+      console.log("minIndex: " + minIndex);
+      // 将0-index部分返回文本
+      this.state.tempSendTxtArray.push(textContent.substring(0, minIndex));
+
+      // 将index部分作分别处理
+      this._matchEmojiString(textContent.substring(minIndex));
+    }
+  }
+
+  _matchEmojiString(emojiStr) {
+    console.log("emojiStr: " + emojiStr);
+    let castStr = emojiStr.match(emojiReg);
+    console.log("castStr: " + castStr.toString());
+    let emojiLength = castStr[0].length;
+
+    let emotoins_code = invertKeyValues(EMOTIONS_ZHCN);
+    console.log("castStr[0]: " + castStr[0]);
+    this.state.tempSendTxtArray.push(emotoins_code[castStr[0]]);
+    console.log("emotoins_code[castStr[0]: " + emotoins_code[castStr[0]]);
+    this._matchContentString(emojiStr.substring(emojiLength));
+
   }
 
   updateView = (emoji, more) => {
@@ -239,6 +312,196 @@ export default class ChattingScreen extends Component {
     }
   }
 
+  _onEmojiSelected(code){
+
+    if (code === '' ){
+      return;
+    }
+
+    console.log("code: " + code);
+    let lastText = '';
+    let currentTextLength = this.state.inputMsg.length;
+
+    if (code === '/{del'){ //删除键
+
+      if (currentTextLength === 0){
+        return;
+      }
+
+      if (this.state.cursorIndex < currentTextLength){ //光标在字符串中间
+
+        let emojiReg = new RegExp('\\[[^\\]]+\\]'); //表情符号正则表达式
+
+        let emojiIndex = this.state.inputMsg.search(emojiReg); //匹配到的第一个表情符位置
+
+        if (emojiIndex === -1){ //没有匹配到表情符
+          let preStr = this.state.inputMsg.substring(0,this.state.cursorIndex);
+          let nextStr = this.state.inputMsg.substring(this.state.cursorIndex);
+          lastText = preStr.substring(0,preStr.length - 1) + nextStr;
+
+          this.setState({
+            cursorIndex:preStr.length - 1,
+          });
+        }
+        else {
+
+          let preStr = this.state.inputMsg.substring(0,this.state.cursorIndex);
+          let nextStr = this.state.inputMsg.substring(this.state.cursorIndex);
+
+          let lastChar = preStr.charAt(preStr.length - 1);
+          if (lastChar === ']'){
+
+            let castArray = preStr.match(emojiReg);
+
+            if(!castArray){
+              let cast = castArray[castArray.length - 1];
+
+              lastText = preStr.substring(0,preStr.length - cast.length) + nextStr;
+
+              this.setState({
+                cursorIndex:preStr.length - cast.length,
+              });
+            }
+            else{
+              lastText = preStr.substring(0,preStr.length - 1) + nextStr;
+
+              this.setState({
+                cursorIndex:preStr.length - 1,
+              });
+            }
+
+          } else {
+
+            lastText = preStr.substring(0,preStr.length - 1) + nextStr;
+            this.setState({
+              cursorIndex:preStr.length - 1,
+            });
+          }
+        }
+
+      }
+      else {  //光标在字符串最后
+
+        let lastChar = this.state.inputMsg.charAt(currentTextLength - 1);
+        if (lastChar === ']'){
+          let castArray = this.state.inputMsg.match(emojiReg);
+
+          if(castArray){
+            let cast = castArray[castArray.length - 1];
+            lastText = this.state.inputMsg.substring(0,this.state.inputMsg.length - cast.length);
+
+            this.setState({
+              cursorIndex:this.state.inputMsg.length - cast.length,
+            });
+          }
+          else{
+            lastText = this.state.inputMsg.substring(0,this.state.inputMsg.length - 1);
+
+            this.setState({
+              cursorIndex:this.state.inputMsg.length - 1,
+            });
+          }
+
+        }
+        else {
+
+          lastText = this.state.inputMsg.substring(0,currentTextLength - 1);
+          this.setState({
+            cursorIndex:currentTextLength - 1,
+          });
+        }
+      }
+
+
+    }
+    else {
+
+      if (this.state.cursorIndex >= currentTextLength) {
+        lastText = this.state.inputMsg + EMOTIONS_ZHCN[code];
+
+        this.setState({
+          cursorIndex:lastText.length
+        });
+
+      }
+      else {
+        let preTemp = this.state.inputMsg.substring(0,this.state.cursorIndex);
+        let nextTemp = this.state.inputMsg.substring(this.state.cursorIndex,currentTextLength);
+        lastText = preTemp + EMOTIONS_ZHCN[code] + nextTemp;
+
+        this.setState({
+          cursorIndex:this.state.cursorIndex + EMOTIONS_ZHCN[code].length
+        });
+      }
+    }
+
+    this.setState({
+      inputMsg:lastText,
+    });
+    this._onInputChangeText(lastText);
+
+  }
+
+  _matchContentMessageString(Views, textContent){
+
+    // 匹配得到index并放入数组中
+    let emojiIndex = textContent.search(emojiReg);
+
+    let checkIndexArray = [];
+    console.log("textContent: " + textContent) ;
+    // 若匹配不到，则直接返回一个全文本
+    if (emojiIndex === -1) {
+      console.log("emojiIndex === -1") ;
+      Views.push(<Text key ={'emptyTextView'+(Math.random()*100)}>{textContent}</Text>);
+
+    } else {
+      console.log("emojiIndex !== -1") ;
+      if (emojiIndex !== -1) {
+        checkIndexArray.push(emojiIndex);
+      }
+
+      // 取index最小者
+      let minIndex = Math.min(...checkIndexArray);
+
+      // 将0-index部分返回文本
+      Views.push(<Text key ={'firstTextView'+(Math.random()*100)}>{textContent.substring(0, minIndex)}</Text>);
+
+      // 将index部分作分别处理
+      this._matchEmojiMessageString(Views, textContent.substring(minIndex));
+    }
+  }
+
+  _matchEmojiMessageString(Views, emojiStr) {
+
+    let castStr = emojiStr.match(emojiReg);
+    let emojiLength = castStr[0].length;
+
+    let emojiImg=EMOTIONS_DATA[castStr[0]];
+
+    if(emojiImg){
+       Views.push(<Image key={emojiStr} style={styles.subEmojiStyle} resizeMethod={'auto'} source={emojiImg}/>);
+    }
+    this._matchContentString(emojiStr.substring(emojiLength));
+
+  }
+
+  _onSelectionChange(event){
+
+    this.setState({
+      cursorIndex:event.nativeEvent.selection.start,
+    });
+  }
+
+  _onInputChangeText(text){
+
+    //设值
+    this.setState({
+      inputMsg:text,
+    });
+
+    }
+
+
   render() {
     var moreView = [];
     if (this.state.showEmojiView) {
@@ -246,8 +509,7 @@ export default class ChattingScreen extends Component {
         <View key={"emoji-view-key"}>
           <View style={{width: width, height: 1 / PixelRatio.get(), backgroundColor: Global.dividerColor}}/>
           <View style={{height: Global.emojiViewHeight}}>
-            <EmojiView
-              handlerSendMoji={this.sendMojiMessage.bind(this)}/>
+            <EmotionsView onSelected={(code) => this._onEmojiSelected(code)}/>
           </View>
         </View>
       );
@@ -283,11 +545,91 @@ export default class ChattingScreen extends Component {
         </View>
         <View style={styles.divider}/>
         <View style={styles.bottomBar}>
-          <ChatBottomBar updateView={this.updateView} handleSendBtnClick={this.handleSendBtnClick}/>
+          {/*<ChatBottomBar updateView={this.updateView} handleSendBtnClick={this.handleSendBtnClick}/>*/}
+          {this.state.barState === BAR_STATE_SHOW_KEYBOARD ?
+          <View style={styles.bottomView}>
+            <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "soundBtn")}>
+              <Image style={styles.icon} source={require('../../images/ic_chat_sound.png')}/>
+            </TouchableOpacity>
+            <TextInput
+              ref="textInput"
+              style={styles.input}
+              underlineColorAndroid="transparent"
+              multiline = {true}
+              autoFocus={true}
+              editable={true}
+              placeholder={'说点什么'}
+              placeholderTextColor={'#bababf'}
+              onSelectionChange={(event) => this._onSelectionChange(event)}
+              onChangeText={(text) => this._onInputChangeText(text)}
+              defaultValue={this.state.inputMsg}/>
+            <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "emojiBtn")}>
+              <Image style={styles.icon} source={require('../../images/ic_chat_emoji.png')}/>
+            </TouchableOpacity>
+            {
+              Utils.isEmpty(this.state.inputMsg) ? (
+                <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "moreBtn")}>
+                  <Image style={[styles.icon, {marginLeft: 10}]} source={require('../../images/ic_chat_add.png')}/>
+                </TouchableOpacity>
+              ) : (
+                <View style={{marginLeft: 10}}>
+                  <Button color={'#49BC1C'} title={"发送"} onPress={() => this.handleSendBtnClick(this.state.inputMsg)}/>
+                </View>
+              )
+            }
+          </View>
+            : <View style={styles.bottomView}>
+              <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "soundBtn")}>
+                <Image style={styles.icon} source={require('../../images/ic_chat_keyboard.png')}/>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.5} style={{flex: 1}}>
+                <View style={styles.recorder}><Text>按住 说话</Text></View>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "emojiBtn")}>
+                <Image style={styles.icon} source={require('../../images/ic_chat_emoji.png')}/>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "moreBtn")}>
+                <Image style={[styles.icon, {marginLeft: 10}]} source={require('../../images/ic_chat_add.png')}/>
+              </TouchableOpacity>
+            </View>}
         </View>
         {moreView}
       </View>
     );
+  }
+
+  handlePress = (tag) => {
+    if ("soundBtn" == tag) {
+      if (this.state.barState === BAR_STATE_SHOW_KEYBOARD) {
+        this.setState({
+          barState: BAR_STATE_SHOW_RECORDER,
+          showEmojiView: false,
+          showMoreView: false,
+        });
+      } else if (this.state.barState === BAR_STATE_SHOW_RECORDER) {
+        this.setState({
+          barState: BAR_STATE_SHOW_KEYBOARD,
+          showEmojiView: false,
+          showMoreView: false,
+        });
+      }
+      this.updateView(false, false);
+    } else if ("emojiBtn" == tag) {
+      var showEmojiView = this.state.showEmojiView;
+      this.updateView(!showEmojiView, false);
+      this.setState({
+        showEmojiView: !showEmojiView,
+        showMoreView: false,
+      })
+    } else if ("moreBtn" == tag) {
+      var showMoreView = this.state.showMoreView;
+      var showEmojiView = this.state.showEmojiView;
+      this.updateView(false, !showMoreView);
+      this.setState({
+        showEmojiView: false,
+        showMoreView: !showMoreView
+      });
+    }
   }
 
   renderItem = (item) => {
@@ -311,6 +653,8 @@ export default class ChattingScreen extends Component {
 
   renderReceivedTextMsg(item) { // 接收的文本消息
     let contactAvatar = require('../../images/avatar.png');
+    let Views = []
+    this._matchContentMessageString(Views, item.item.receiveMessage)
     // if (!Utils.isEmpty(this.chatWithAvatar)) {
     //   contactAvatar = this.chatWithAvatar;
     // }
@@ -324,7 +668,9 @@ export default class ChattingScreen extends Component {
         <View style={listItemStyle.container}>
           <Image style={listItemStyle.avatar} source={contactAvatar}/>
           <View style={listItemStyle.msgContainer}>
-            <Text style={listItemStyle.msgText}>{item.item.receiveMessage}</Text>
+            <View style={styles.mojicontainer}>
+              {Views}
+            </View>
           </View>
         </View>
       </View>
@@ -333,6 +679,8 @@ export default class ChattingScreen extends Component {
 
   renderSendTextMsg(item) { // 发送出去的文本消息
     let avatar = require('../../images/avatar.png');
+    let Views = []
+    this._matchContentMessageString(Views, item.item.sendMessage)
     // if (!Utils.isEmpty(this.state.userInfo.avatar)) {
     //   avatar = {uri: this.state.userInfo.avatar};
     // }
@@ -346,7 +694,9 @@ export default class ChattingScreen extends Component {
         }
         <View style={listItemStyle.containerSend}>
           <View style={listItemStyle.msgContainerSend}>
-            <Text style={listItemStyle.msgText}>{item.item.sendMessage}</Text>
+            <View style={styles.mojicontainer}>
+              {Views}
+            </View>
           </View>
           <Image style={listItemStyle.avatar} source={avatar}/>
         </View>
@@ -408,7 +758,9 @@ export default class ChattingScreen extends Component {
       </View>
     );
   }
+
 }
+
 
 const listItemStyle = StyleSheet.create({
   container: {
@@ -460,7 +812,7 @@ const listItemStyle = StyleSheet.create({
     color: '#FFFFFF',
     marginTop: 10,
     fontSize: 11,
-  }
+  },
 });
 
 const styles = StyleSheet.create({
@@ -481,5 +833,45 @@ const styles = StyleSheet.create({
     width: width,
     height: 1 / PixelRatio.get(),
     backgroundColor: Global.dividerColor,
+  },
+  icon: {
+    width: 40,
+    height: 40,
+    padding: 5,
+  },
+  recorder: {
+    flex: 1,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    borderWidth: 1 / PixelRatio.get(),
+    borderColor: '#6E7377',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomView:{
+    flex: 1,
+    flexDirection: 'row',
+    height: 50,
+    alignItems: 'center',
+    backgroundColor: '#F4F4F4',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  input: {
+    flex: 1,
+  },
+
+  mojicontainer: {
+    flexDirection:'row',
+    alignItems:'center',
+    flexWrap:'wrap',
+  },
+
+  subEmojiStyle:{
+    width:25,
+    height:25,
   }
 });
