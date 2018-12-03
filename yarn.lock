@@ -1357,7 +1357,7 @@ cosmiconfig@^5.0.5:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-create-react-class@^15.6.3:
+create-react-class@^15.6.0, create-react-class@^15.6.3:
   version "15.6.3"
   resolved "http://registry.npm.taobao.org/create-react-class/download/create-react-class-15.6.3.tgz#2d73237fb3f970ae6ebe011a9e66f46dbca80036"
   dependencies:
@@ -4029,7 +4029,7 @@ prompts@^0.1.9:
     kleur "^2.0.1"
     sisteransi "^0.1.1"
 
-prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@latest:
+prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@latest:
   version "15.6.2"
   resolved "http://registry.npm.taobao.org/prop-types/download/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -4099,7 +4099,7 @@ react-deep-force-update@^1.0.0:
   version "1.1.2"
   resolved "http://registry.npm.taobao.org/react-deep-force-update/download/react-deep-force-update-1.1.2.tgz#3d2ae45c2c9040cbb1772be52f8ea1ade6ca2ee1"
 
-react-devtools-core@^3.4.0:
+react-devtools-core@^3.4.2:
   version "3.4.3"
   resolved "http://registry.npm.taobao.org/react-devtools-core/download/react-devtools-core-3.4.3.tgz#1a06b7dc546d41ecf8dc4fbabea2d79d339353cf"
   dependencies:
@@ -4134,6 +4134,13 @@ react-native-image-crop-picker@^0.15.1:
   version "0.15.3"
   resolved "http://registry.npm.taobao.org/react-native-image-crop-picker/download/react-native-image-crop-picker-0.15.3.tgz#86572597c0cbf53a17db4527d4f8b99be6a23b52"
 
+react-native-modalbox@^1.6.0:
+  version "1.6.0"
+  resolved "http://registry.npm.taobao.org/react-native-modalbox/download/react-native-modalbox-1.6.0.tgz#ee353a2d568715a2b10db8eeb91132fb1f45952b"
+  dependencies:
+    create-react-class "^15.6.0"
+    prop-types "^15.5.10"
+
 react-native-router-flux@^4.0.6:
   version "4.0.6"
   resolved "http://registry.npm.taobao.org/react-native-router-flux/download/react-native-router-flux-4.0.6.tgz#e4723f5ce89cb5822e0c9bb6d0a8d4de6179eb58"
@@ -4166,9 +4173,9 @@ react-native-tab-view@^1.0.0:
   dependencies:
     prop-types "^15.6.1"
 
-react-native@0.57.5:
-  version "0.57.5"
-  resolved "http://registry.npm.taobao.org/react-native/download/react-native-0.57.5.tgz#f1dbcbf1f889845fba954f3e0d47e61cf89d41d9"
+react-native@0.57.7:
+  version "0.57.7"
+  resolved "http://registry.npm.taobao.org/react-native/download/react-native-0.57.7.tgz#5b3af1c43366c41d8d8d2540fea8ce590060bca1"
   dependencies:
     "@babel/runtime" "^7.0.0"
     absolute-path "^0.0.0"
@@ -4210,7 +4217,7 @@ react-native@0.57.5:
     promise "^7.1.1"
     prop-types "^15.5.8"
     react-clone-referenced-element "^1.0.1"
-    react-devtools-core "^3.4.0"
+    react-devtools-core "^3.4.2"
     react-timer-mixin "^0.13.2"
     regenerator-runtime "^0.11.0"
     rimraf "^2.5.4"
@@ -4521,6 +4528,10 @@ rimraf@^2.5.4, rimraf@^2.6.1:
 rimraf@~2.2.6:
   version "2.2.8"
   resolved "http://registry.npm.taobao.org/rimraf/download/rimraf-2.2.8.tgz#e439be2aaee327321952730f99a8929e4fc50582"
+
+rn-viewpager@^1.2.9:
+  version "1.2.9"
+  resolved "http://registry.npm.taobao.org/rn-viewpager/download/rn-viewpager-1.2.9.tgz#7f06f898e23b296f3b5be7c98bd9101d94427779"
 
 rsvp@^3.3.3:
   version "3.6.2"
