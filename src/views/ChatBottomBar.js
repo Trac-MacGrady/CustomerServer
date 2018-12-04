@@ -67,7 +67,7 @@ export default class ChatBottomBar extends Component {
                       style={styles.input}
                       underlineColorAndroid="transparent"
                       multiline = {true}
-                      autoFocus={true}
+                      autoFocus={false}
                       editable={true}
                       placeholder={'说点什么'}
                       placeholderTextColor={'#bababf'}

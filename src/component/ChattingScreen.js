@@ -12,14 +12,14 @@ import CountEmitter from '../event/CountEmitter';
 import ConversationUtil from '../utils/ConversationUtil';
 
 import {
-  Dimensions,
-  FlatList,
-  Image,
-  PixelRatio,
-  StyleSheet,
-  Text,
-  View,
-  DeviceEventEmitter,
+    Dimensions,
+    FlatList,
+    Image,
+    PixelRatio,
+    StyleSheet,
+    Text,
+    View,
+    DeviceEventEmitter, TouchableOpacity,
 } from 'react-native'
 import NativeDealMessage from '../native/NativeDealMessage'
 import NativeCustomerServerSet from '../native/NativeCustomerServerSet'
@@ -149,6 +149,8 @@ export default class ChattingScreen extends Component {
       tempSendTxtArray:[],
     });
 
+    this.state.tempSendTxtArray = [];
+      console.log("tempSendTxtArray: " + this.state.tempSendTxtArray.toString());
     let finalMsg = '';
     if (msg !== '' && msg.length > 0) {
       this._matchContentString(msg);
@@ -161,6 +163,10 @@ export default class ChattingScreen extends Component {
       this.sendTextMessage(finalMsg);
     }
 
+      this.setState({
+          tempSendTxtArray:[],
+      });
+      this.state.tempSendTxtArray = [];
 
     // this.sendTextMessage(msg);
     // this.setState({inputMsg: ''});
@@ -233,18 +239,17 @@ export default class ChattingScreen extends Component {
 
   _matchContentString(textContent){
 
-    console.log("textContext: " + textContent);
     // 匹配得到index并放入数组中
     let currentTextLength = textContent.length;
 
     let emojiIndex = textContent.search(emojiReg);
 
     let checkIndexArray = [];
-    console.log("emojiIndex: " + emojiIndex);
     // 若匹配不到，则直接返回一个全文本
     if (emojiIndex === -1) {
-
-      this.state.tempSendTxtArray.push(textContent.substring(0,currentTextLength));
+      if (!Utils.isEmpty(textContent.substring(0,currentTextLength))) {
+          this.state.tempSendTxtArray.push(textContent.substring(0,currentTextLength));
+      }
 
     } else {
 
@@ -253,12 +258,11 @@ export default class ChattingScreen extends Component {
       }
 
       // 取index最小者
-      console.log("111111111111111111111111");
       let minIndex = Math.min(...checkIndexArray);
-      console.log("2222222222222222222222222");
-      console.log("minIndex: " + minIndex);
       // 将0-index部分返回文本
-      this.state.tempSendTxtArray.push(textContent.substring(0, minIndex));
+        if (!Utils.isEmpty(textContent.substring(0, minIndex))) {
+            this.state.tempSendTxtArray.push(textContent.substring(0, minIndex));
+        }
 
       // 将index部分作分别处理
       this._matchEmojiString(textContent.substring(minIndex));
@@ -266,16 +270,14 @@ export default class ChattingScreen extends Component {
   }
 
   _matchEmojiString(emojiStr) {
-    console.log("emojiStr: " + emojiStr);
     let castStr = emojiStr.match(emojiReg);
-    console.log("castStr: " + castStr.toString());
     let emojiLength = castStr[0].length;
 
     let emotoins_code = invertKeyValues(EMOTIONS_ZHCN);
-    console.log("castStr[0]: " + castStr[0]);
-    this.state.tempSendTxtArray.push(emotoins_code[castStr[0]]);
-    console.log("emotoins_code[castStr[0]: " + emotoins_code[castStr[0]]);
-    this._matchContentString(emojiStr.substring(emojiLength));
+    if (!Utils.isEmpty(emotoins_code[castStr[0]])) {
+        this.state.tempSendTxtArray.push(emotoins_code[castStr[0]]);
+        this._matchContentString(emojiStr.substring(emojiLength));
+    }
 
   }
 
@@ -346,7 +348,7 @@ export default class ChattingScreen extends Component {
     if(emojiImg){
        Views.push(<Image key={emojiStr} style={styles.subEmojiStyle} resizeMethod={'auto'} source={emojiImg}/>);
     }
-    this._matchContentString(emojiStr.substring(emojiLength));
+    this._matchContentMessageString(Views, emojiStr.substring(emojiLength));
 
   }
 
@@ -358,37 +360,9 @@ export default class ChattingScreen extends Component {
   }
 
   render() {
-    // var moreView = [];
-    // if (this.state.showEmojiView) {
-    //   moreView.push(
-    //     <View key={"emoji-view-key"}>
-    //       <View style={{width: width, height: 1 / PixelRatio.get(), backgroundColor: Global.dividerColor}}/>
-    //       <View style={{height: Global.emojiViewHeight}}>
-    //         <EmotionsView onSelected={(code) => this._onEmojiSelected(code)}/>
-    //       </View>
-    //     </View>
-    //   );
-    // }
-    // if (this.state.showMoreView) {
-    //   moreView.push(
-    //     <View key={"more-view-key"}>
-    //       <View style={{width: width, height: 1 / PixelRatio.get(), backgroundColor: Global.dividerColor}}/>
-    //       <View style={{height: Global.emojiViewHeight}}>
-    //         <MoreView
-    //           sendImageMessage={this.sendImageMessage.bind(this)}
-    //         />
-    //       </View>
-    //     </View>
-    //   );
-    // }
     return (
       <View style={styles.container}>
-        <CommonTitleBar title={this.chatUsername} nav={this.props.navigation}/>
-        {
-          this.state.showProgress ? (
-            <LoadingView cancel={() => this.setState({showProgress: false})}/>
-          ) : (null)
-        }
+
         <View style={styles.content}>
           <FlatList
             ref="flatList"
@@ -398,46 +372,13 @@ export default class ChattingScreen extends Component {
             extraData={this.state}
           />
         </View>
+
         <View style={styles.divider}/>
         <View style={styles.bottomBar}>
           <ChatBottomBar updateView={this.updateView} handleSendBtnClick={this.handleSendBtnClick} sendImageMessage={this.sendImageMessage}/>
         </View>
       </View>
     );
-  }
-
-  handlePress = (tag) => {
-    if ("soundBtn" == tag) {
-      if (this.state.barState === BAR_STATE_SHOW_KEYBOARD) {
-        this.setState({
-          barState: BAR_STATE_SHOW_RECORDER,
-          showEmojiView: false,
-          showMoreView: false,
-        });
-      } else if (this.state.barState === BAR_STATE_SHOW_RECORDER) {
-        this.setState({
-          barState: BAR_STATE_SHOW_KEYBOARD,
-          showEmojiView: false,
-          showMoreView: false,
-        });
-      }
-      this.updateView(false, false);
-    } else if ("emojiBtn" == tag) {
-      var showEmojiView = this.state.showEmojiView;
-      this.updateView(!showEmojiView, false);
-      this.setState({
-        showEmojiView: !showEmojiView,
-        showMoreView: false,
-      })
-    } else if ("moreBtn" == tag) {
-      var showMoreView = this.state.showMoreView;
-      var showEmojiView = this.state.showEmojiView;
-      this.updateView(false, !showMoreView);
-      this.setState({
-        showEmojiView: false,
-        showMoreView: !showMoreView
-      });
-    }
   }
 
   renderItem = (item) => {
