@@ -203,6 +203,7 @@ export default class ChattingScreen extends Component {
   }
   
   scroll() {
+    console.log("scroll----------------");
     this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 0);
   }
 
@@ -560,7 +561,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     backgroundColor: Global.pageBackgroundColor,
     position: 'relative',
-    bottom: 50,
+    bottom: 48,
   },
   bottomBar: {
     height: 50,

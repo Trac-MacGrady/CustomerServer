@@ -3,18 +3,18 @@ import Utils from '../utils/Utils';
 
 import {
     Button, Dimensions,
-    Image, KeyboardAvoidingView,
+    Image, 
     PixelRatio,
     StyleSheet,
-    Text,
     TextInput,
-    TouchableOpacity, TouchableWithoutFeedback,
+    TouchableOpacity, 
     View,
 } from 'react-native';
 import Global from "../utils/Global";
 import EmotionsView from "../widget/moji/EmotionsView";
 import {EMOTIONS_ZHCN} from "../widget/moji/DataSource";
 import MoreView from "./MoreView";
+import ImagePicker from 'react-native-image-crop-picker';
 const {width} = Dimensions.get('window');
 const {height} = Dimensions.get('window');
 let emojiReg = new RegExp('\\[[^\\]]+\\]','g'); //表情符号正则表达式
@@ -42,18 +42,18 @@ export default class ChatBottomBar extends Component {
               </View>
           );
       }
-      if (this.state.showMoreView) {
-          moreView.push(
-              <View key={"more-view-key"}>
-                  <View style={{width: width, height: 1 / PixelRatio.get(), backgroundColor: Global.dividerColor}}/>
-                  <View style={{height: Global.emojiViewHeight}}>
-                      <MoreView
-                          sendImageMessage={this.props.sendImageMessage} 
-                      />
-                  </View>
-              </View>
-          );
-      }
+      // if (this.state.showMoreView) {
+      //     moreView.push(
+      //         <View key={"more-view-key"}>
+      //             <View style={{width: width, height: 1 / PixelRatio.get(), backgroundColor: Global.dividerColor}}/>
+      //             <View style={{height: Global.emojiViewHeight}}>
+      //                 <MoreView
+      //                     sendImageMessage={this.props.sendImageMessage}
+      //                 />
+      //             </View>
+      //         </View>
+      //     );
+      // }
 
       /**
        *   设置一个透明可点击View， 当Emoji或者More时，点击隐藏   判断只在Emoji或more打开时添加
@@ -69,9 +69,15 @@ export default class ChatBottomBar extends Component {
 
               }
               <View style={styles.textContainer}>
-                  <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "emojiBtn")}>
-                      <Image style={styles.icon} source={require('../../images/ic_chat_emoji.png')}/>
-                  </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.5} onPress={this.chooseImage.bind(this)}>
+                  <Image style={[styles.icon, {marginLeft: 10}]} source={require('../../images/ic_more_gallery.png')}/>
+                </TouchableOpacity>
+
+                <View style={{width:1.5, height:40, backgroundColor:"#bababf", marginLeft:10}}/>
+                <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "emojiBtn")}>
+                  <Image style={[styles.icon, {marginLeft: 10}]} source={require('../../images/ic_chat_emoji.png')}/>
+                </TouchableOpacity>
+                <View style={{width:1.5, height:40, backgroundColor:"#bababf", marginLeft:10}}/>
                   <TextInput
                       ref="textInput"
                       style={styles.input}
@@ -79,7 +85,7 @@ export default class ChatBottomBar extends Component {
                       multiline = {true}
                       autoFocus={false}
                       editable={true}
-                      placeholder={'说点什么'}
+                      placeholder={'请输入'}
                       placeholderTextColor={'#bababf'}
                       onSelectionChange={(event) => this._onSelectionChange(event)}
                       onChangeText={(text) => this._onInputChangeText(text)}
@@ -87,11 +93,11 @@ export default class ChatBottomBar extends Component {
 
                   {
                       Utils.isEmpty(this.state.inputMsg) ? (
-                          <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "moreBtn")}>
-                              <Image style={[styles.icon, {marginLeft: 10}]} source={require('../../images/ic_chat_add.png')}/>
-                          </TouchableOpacity>
+                        <View style={{marginLeft: 10, marginRight:10}}>
+                          <Button color={'#bababf'} title={"发送"}/>
+                        </View>
                       ) : (
-                          <View style={{marginLeft: 10}}>
+                          <View style={{marginLeft: 10, marginRight:10}}>
                               <Button color={'#49BC1C'} title={"发送"} onPress={() => this.sendMsg()}/>
                           </View>
                       )
@@ -104,6 +110,23 @@ export default class ChatBottomBar extends Component {
               }
           </View>
                 );
+  }
+
+  /**
+   * 選擇图片
+   */
+  chooseImage() { // 从相册中选择图片发送
+    ImagePicker.openPicker({
+      cropping: false
+    }).then(image => {
+      if (this.props.sendImageMessage) {
+        let path = image.path;
+        if (!Utils.isEmpty(path)) {
+          let name = path.substring(path.lastIndexOf('/') + 1, path.length);
+          this.props.sendImageMessage(image);
+        }
+      }
+    });
   }
 
 
@@ -298,7 +321,17 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   input: {
-    flex: 1,
+    flex:1,
+    paddingTop:8,
+    paddingBottom:8,
+    paddingLeft:10,
+    paddingRight:10,
+    height:32,
+    marginLeft:10,
+    backgroundColor:'#ffffff',
+    borderWidth:0,
+    borderRadius:20,
+    fontSize:15,
   },
   icon: {
     width: 40,
