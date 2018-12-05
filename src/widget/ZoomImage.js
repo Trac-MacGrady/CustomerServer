@@ -15,7 +15,7 @@ import {
 import Animation from './Animation';
 const winWidth = Dimensions.get('window').width;
 const winHeight = Dimensions.get('window').height;
-const winRatio = winWidth / winHeight;
+const winRatio = winWidth / winHeight;     
 import PropTypes from 'prop-types';
 
 const RCTUIManager = NativeModules.UIManager;
@@ -52,9 +52,14 @@ class ZoomImage extends Component {
   }
   getMaxSizeByRatio (ratio) {
     return {
-      width: ratio >= winRatio ? winWidth : winWidth / ratio,
-      height: ratio >= winRatio ? winWidth / ratio : winHeight
+      width: winHeight * ratio,
+      height: winHeight,
     };
+
+    // return {
+    //   width: ratio >= winRatio ? winWidth : winWidth / ratio,         // 横屏
+    //   height: ratio >= winRatio ? winWidth / ratio : winHeight,
+    // };
   }
   componentDidMount () {
     if (this.props.source.uri) {

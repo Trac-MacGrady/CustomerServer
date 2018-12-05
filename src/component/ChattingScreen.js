@@ -1,35 +1,30 @@
 import React, {Component} from 'react';
-import CommonTitleBar from '../views/CommonTitleBar';
 import Global from '../utils/Global';
 import Utils from '../utils/Utils';
 import TimeUtils from '../utils/TimeUtil';
 import TimeUtil from '../utils/TimeUtil';
 import ChatBottomBar from '../views/ChatBottomBar';
-import MoreView from '../views/MoreView';
-import LoadingView from '../views/LoadingView';
 import StorageUtil from '../utils/StorageUtil';
 import CountEmitter from '../event/CountEmitter';
 import ConversationUtil from '../utils/ConversationUtil';
 
 import {
-    Dimensions,
-    FlatList,
-    Image,
-    PixelRatio,
-    StyleSheet,
-    Text,
-    View,
-    DeviceEventEmitter, TouchableOpacity,
+  Dimensions,
+  FlatList,
+  Image,
+  PixelRatio,
+  StyleSheet,
+  Text,
+  View,
+  DeviceEventEmitter,
+  BackHandler
 } from 'react-native'
 import NativeDealMessage from '../native/NativeDealMessage'
 import NativeCustomerServerSet from '../native/NativeCustomerServerSet'
 import ZoomImage from '../widget/ZoomImage'
-import EmotionsView from '../widget/moji/EmotionsView'
 import { EMOTIONS_DATA, EMOTIONS_ZHCN, invertKeyValues } from '../widget/moji/DataSource'
 
 const {width} = Dimensions.get('window');
-const BAR_STATE_SHOW_KEYBOARD = 1;
-const BAR_STATE_SHOW_RECORDER = 2;
 let emojiReg = new RegExp('\\[[^\\]]+\\]','g'); //表情符号正则表达式
 
 export default class ChattingScreen extends Component {
@@ -45,7 +40,6 @@ export default class ChattingScreen extends Component {
       messagessss: [],
       tempSendTxtArray:[],
       cursorIndex:0,
-      barState: BAR_STATE_SHOW_KEYBOARD,
     };
 
     ConversationUtil.getConversations("hongwang", (data) => {
@@ -75,6 +69,11 @@ export default class ChattingScreen extends Component {
     this.createAccount();
     this.receiveTextMessage();
     this.receiveImageMessage();
+  }
+
+  componentDidMount() {
+    //获取通道信息
+    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBack)
   }
 
 
@@ -163,13 +162,11 @@ export default class ChattingScreen extends Component {
       this.sendTextMessage(finalMsg);
     }
 
-      this.setState({
-          tempSendTxtArray:[],
-      });
-      this.state.tempSendTxtArray = [];
-
-    // this.sendTextMessage(msg);
-    // this.setState({inputMsg: ''});
+    // 消息发送后状态置空
+    this.setState({
+        tempSendTxtArray:[],
+    });
+    this.state.tempSendTxtArray = [];
   }
 
   sendTextMessage = async (msg) =>{ // 发送文本消息
@@ -227,6 +224,7 @@ export default class ChattingScreen extends Component {
   }
 
   componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBack)
     this.scrollTimeout && clearTimeout(this.scrollTimeout);
     CountEmitter.removeListener('notifyChattingRefresh', ()=>{});
     // 通知会话列表刷新未读数
@@ -239,12 +237,14 @@ export default class ChattingScreen extends Component {
 
   _matchContentString(textContent){
 
+    console.log("textContext: " + textContent);
     // 匹配得到index并放入数组中
     let currentTextLength = textContent.length;
 
     let emojiIndex = textContent.search(emojiReg);
 
     let checkIndexArray = [];
+    console.log("emojiIndex: " + emojiIndex);
     // 若匹配不到，则直接返回一个全文本
     if (emojiIndex === -1) {
       if (!Utils.isEmpty(textContent.substring(0,currentTextLength))) {
@@ -258,7 +258,10 @@ export default class ChattingScreen extends Component {
       }
 
       // 取index最小者
+      console.log("111111111111111111111111");
       let minIndex = Math.min(...checkIndexArray);
+      console.log("2222222222222222222222222");
+      console.log("minIndex: " + minIndex);
       // 将0-index部分返回文本
         if (!Utils.isEmpty(textContent.substring(0, minIndex))) {
             this.state.tempSendTxtArray.push(textContent.substring(0, minIndex));
@@ -270,7 +273,9 @@ export default class ChattingScreen extends Component {
   }
 
   _matchEmojiString(emojiStr) {
+    console.log("emojiStr: " + emojiStr);
     let castStr = emojiStr.match(emojiReg);
+    console.log("castStr: " + castStr.toString());
     let emojiLength = castStr[0].length;
 
     let emotoins_code = invertKeyValues(EMOTIONS_ZHCN);
@@ -362,7 +367,6 @@ export default class ChattingScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-
         <View style={styles.content}>
           <FlatList
             ref="flatList"
@@ -372,7 +376,6 @@ export default class ChattingScreen extends Component {
             extraData={this.state}
           />
         </View>
-
         <View style={styles.divider}/>
         <View style={styles.bottomBar}>
           <ChatBottomBar updateView={this.updateView} handleSendBtnClick={this.handleSendBtnClick} sendImageMessage={this.sendImageMessage}/>
