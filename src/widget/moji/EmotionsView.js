@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
 
   wrapper: {
     width:'100%',
-    height:175,
+    height:200,
     paddingTop:10,
     backgroundColor:'white'
   },

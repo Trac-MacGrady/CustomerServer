@@ -25,6 +25,7 @@ import ZoomImage from '../widget/ZoomImage'
 import { EMOTIONS_DATA, EMOTIONS_ZHCN, invertKeyValues } from '../widget/moji/DataSource'
 
 const {width} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 let emojiReg = new RegExp('\\[[^\\]]+\\]','g'); //表情符号正则表达式
 
 export default class ChattingScreen extends Component {
@@ -360,9 +361,7 @@ export default class ChattingScreen extends Component {
           />
         </View>
         <View style={styles.divider}/>
-        <View style={styles.bottomBar}>
-          <ChatBottomBar handleSendBtnClick={this.handleSendBtnClick} sendImageMessage={this.sendImageMessage}/>
-        </View>
+        <ChatBottomBar handleSendBtnClick={this.handleSendBtnClick} sendImageMessage={this.sendImageMessage}/>
       </View>
     );
   }
@@ -559,7 +558,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'flex-start',
-    backgroundColor: Global.pageBackgroundColor
+    backgroundColor: Global.pageBackgroundColor,
+    position: 'relative',
+    bottom: 50,
   },
   bottomBar: {
     height: 50,

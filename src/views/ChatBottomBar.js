@@ -16,6 +16,7 @@ import EmotionsView from "../widget/moji/EmotionsView";
 import {EMOTIONS_ZHCN} from "../widget/moji/DataSource";
 import MoreView from "./MoreView";
 const {width} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 let emojiReg = new RegExp('\\[[^\\]]+\\]','g'); //表情符号正则表达式
 
 export default class ChatBottomBar extends Component {
@@ -47,17 +48,26 @@ export default class ChatBottomBar extends Component {
                   <View style={{width: width, height: 1 / PixelRatio.get(), backgroundColor: Global.dividerColor}}/>
                   <View style={{height: Global.emojiViewHeight}}>
                       <MoreView
-                          sendImageMessage={this.props.sendImageMessage}
+                          sendImageMessage={this.props.sendImageMessage} 
                       />
                   </View>
               </View>
           );
       }
 
+      /**
+       *   设置一个透明可点击View， 当Emoji或者More时，点击隐藏   判断只在Emoji或more打开时添加
+       * */
       return (
 
           <View style={styles.inputContainer}>
+             {
+               (this.state.showEmojiView || this.state.showMoreView) &&
+                <TouchableOpacity onPress={this.closeInputBar.bind(this)}>
+                  <View style={{height:height-265, width:'100%', backgroundColor: 'transparent'}}/>
+                </TouchableOpacity>
 
+              }
               <View style={styles.textContainer}>
                   <TouchableOpacity activeOpacity={0.5} onPress={this.handlePress.bind(this, "emojiBtn")}>
                       <Image style={styles.icon} source={require('../../images/ic_chat_emoji.png')}/>
@@ -95,6 +105,7 @@ export default class ChatBottomBar extends Component {
           </View>
                 );
   }
+
 
     _onEmojiSelected(code){
 
@@ -248,12 +259,19 @@ export default class ChatBottomBar extends Component {
       onSendBtnClickListener(this.state.inputMsg);
     }
     this.setState({inputMsg: ''});
+    this.closeInputBar();
   }
 
-    // sendImageMessage() {
-    //     this.props.handleSendBtnClick
-    // }
-
+  /**
+   * 关闭打开的MoreView
+   */
+  closeInputBar() {
+    this.setState({
+      showEmojiView: false,
+      showMoreView: false,
+    })
+  }
+  
   handlePress = (tag) => {
    if ("emojiBtn" === tag) {
       this.setState({
