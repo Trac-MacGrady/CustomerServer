@@ -256,19 +256,14 @@ export default class ChatBottomBar extends Component {
 
   handlePress = (tag) => {
    if ("emojiBtn" === tag) {
-      var showEmojiView = this.state.showEmojiView;
-      this.props.updateView(!showEmojiView, false);
       this.setState({
-        showEmojiView: !showEmojiView,
+        showEmojiView: !this.state.showEmojiView,
         showMoreView: false,
       })
     } else if ("moreBtn" === tag) {
-      var showMoreView = this.state.showMoreView;
-      var showEmojiView = this.state.showEmojiView;
-      this.props.updateView(false, !showMoreView);
       this.setState({
         showEmojiView: false,
-        showMoreView: !showMoreView
+        showMoreView: !this.state.showMoreView
       });
     }
   }

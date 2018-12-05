@@ -31,10 +31,6 @@ export default class ChattingScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showEmojiView: false,
-      showMoreView: false,
-      showProgress: false,
-      isSessionStarted: false,
       conversation: null,
       isLoginServer:'',
       messagessss: [],
@@ -236,15 +232,12 @@ export default class ChattingScreen extends Component {
   }
 
   _matchContentString(textContent){
-
-    console.log("textContext: " + textContent);
     // 匹配得到index并放入数组中
     let currentTextLength = textContent.length;
 
     let emojiIndex = textContent.search(emojiReg);
 
     let checkIndexArray = [];
-    console.log("emojiIndex: " + emojiIndex);
     // 若匹配不到，则直接返回一个全文本
     if (emojiIndex === -1) {
       if (!Utils.isEmpty(textContent.substring(0,currentTextLength))) {
@@ -258,10 +251,7 @@ export default class ChattingScreen extends Component {
       }
 
       // 取index最小者
-      console.log("111111111111111111111111");
       let minIndex = Math.min(...checkIndexArray);
-      console.log("2222222222222222222222222");
-      console.log("minIndex: " + minIndex);
       // 将0-index部分返回文本
         if (!Utils.isEmpty(textContent.substring(0, minIndex))) {
             this.state.tempSendTxtArray.push(textContent.substring(0, minIndex));
@@ -284,13 +274,6 @@ export default class ChattingScreen extends Component {
         this._matchContentString(emojiStr.substring(emojiLength));
     }
 
-  }
-
-  updateView = (emoji, more) => {
-    this.setState({
-      showEmojiView: emoji,
-      showMoreView: more,
-    })
   }
 
   _keyExtractor = (item, index) => index
@@ -378,7 +361,7 @@ export default class ChattingScreen extends Component {
         </View>
         <View style={styles.divider}/>
         <View style={styles.bottomBar}>
-          <ChatBottomBar updateView={this.updateView} handleSendBtnClick={this.handleSendBtnClick} sendImageMessage={this.sendImageMessage}/>
+          <ChatBottomBar handleSendBtnClick={this.handleSendBtnClick} sendImageMessage={this.sendImageMessage}/>
         </View>
       </View>
     );
