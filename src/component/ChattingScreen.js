@@ -129,8 +129,11 @@ export default class ChattingScreen extends Component {
     });
   }
 
+  /**
+   * 发送文字及表情消息
+   * @param msg
+   */
   handleSendBtnClick = (msg) => {
-
     console.log("msg: " + msg);
     this.setState({
       tempSendTxtArray:[],
@@ -172,6 +175,11 @@ export default class ChattingScreen extends Component {
     })
   }
 
+  /**
+   * 发送图片消息
+   * @param image
+   * @returns {Promise<void>}
+   */
   sendImageMessage = async (image) => { // 发送图片消息
     let imagePath = image.path;
     let imageWidth = image.width;
@@ -238,29 +246,24 @@ export default class ChattingScreen extends Component {
   _matchContentString(textContent){
     // 匹配得到index并放入数组中
     let currentTextLength = textContent.length;
-
     let emojiIndex = textContent.search(emojiReg);
-
     let checkIndexArray = [];
     // 若匹配不到，则直接返回一个全文本
     if (emojiIndex === -1) {
       if (!Utils.isEmpty(textContent.substring(0,currentTextLength))) {
           this.state.tempSendTxtArray.push(textContent.substring(0,currentTextLength));
       }
-
     } else {
 
       if (emojiIndex !== -1) {
         checkIndexArray.push(emojiIndex);
       }
-
       // 取index最小者
       let minIndex = Math.min(...checkIndexArray);
       // 将0-index部分返回文本
         if (!Utils.isEmpty(textContent.substring(0, minIndex))) {
             this.state.tempSendTxtArray.push(textContent.substring(0, minIndex));
         }
-
       // 将index部分作分别处理
       this._matchEmojiString(textContent.substring(minIndex));
     }
@@ -292,7 +295,7 @@ export default class ChattingScreen extends Component {
       let messages = this.state.messagessss;
       if (!Utils.isEmpty(messages) && messages.length > 0) {
         let preMsg = messages[index - 1];
-        let delta = item.item.time - preMsg.time;
+        let delta = item.item.messageTime - preMsg.messageTime;
         if (delta > 3 * 60) {
           return true;
         }
@@ -403,6 +406,7 @@ export default class ChattingScreen extends Component {
             <Text style={listItemStyle.time}>{TimeUtils.formatChatTime(parseInt(item.item.messageTime))}</Text>
           ) : (null)
         }
+
         <View style={listItemStyle.container}>
           <Image style={listItemStyle.avatar} source={contactAvatar}/>
           <View style={listItemStyle.msgContainer}>
@@ -548,8 +552,9 @@ const listItemStyle = StyleSheet.create({
     paddingBottom: 4,
     borderRadius: 5,
     color: '#FFFFFF',
-    marginTop: 10,
+    // marginTop: 10,
     fontSize: 11,
+    marginTop:58
   },
 });
 
