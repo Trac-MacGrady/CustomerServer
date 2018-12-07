@@ -7,13 +7,13 @@
     "test": "jest"
   },
   "dependencies": {
+    "events": "^1.1.1",
+    "prop-types": "latest",
     "react": "16.6.1",
     "react-native": "0.57.7",
-    "events": "^1.1.1",
-    "react-native-router-flux": "^4.0.6",
     "react-native-image-crop-picker": "^0.15.1",
-    "prop-types": "latest",
     "react-native-modalbox": "^1.6.0",
+    "react-native-router-flux": "^4.0.6",
     "rn-viewpager": "^1.2.9"
   },
   "devDependencies": {

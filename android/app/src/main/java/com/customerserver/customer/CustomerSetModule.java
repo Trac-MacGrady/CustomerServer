@@ -1,14 +1,14 @@
 package com.customerserver.customer;
 
 import android.util.Log;
-import android.widget.Toast;
-
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.hyphenate.chat.ChatClient;
 import com.hyphenate.helpdesk.Error;
 import com.hyphenate.helpdesk.callback.Callback;
@@ -17,12 +17,13 @@ import com.hyphenate.helpdesk.callback.Callback;
  * Created by wh on 2018/11/21.
  */
 
-public class CustomerSetModule extends ReactContextBaseJavaModule {
+public class CustomerSetModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
     private ReactApplicationContext mContext;
     private String TAG = "CustomerSetModule";
     public CustomerSetModule(ReactApplicationContext reactContext) {
         super(reactContext);
         mContext = reactContext;
+        mContext.addLifecycleEventListener(this);
     }
 
     @Override
@@ -111,6 +112,22 @@ public class CustomerSetModule extends ReactContextBaseJavaModule {
 
             }
         });
+    }
+
+    @Override
+    public void onHostResume() {
+        Log.e(TAG, "onHostResume");
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onResume", "true");
+    }
+
+    @Override
+    public void onHostPause() {
+
+    }
+
+    @Override
+    public void onHostDestroy() {
+
     }
 
 }

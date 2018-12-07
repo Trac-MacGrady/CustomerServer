@@ -23,6 +23,7 @@ import NativeDealMessage from '../native/NativeDealMessage'
 import NativeCustomerServerSet from '../native/NativeCustomerServerSet'
 import ZoomImage from '../widget/ZoomImage'
 import { EMOTIONS_DATA, EMOTIONS_ZHCN, invertKeyValues } from '../widget/moji/DataSource'
+import {Actions} from 'react-native-router-flux';
 
 const {width} = Dimensions.get('window');
 const {height} = Dimensions.get('window');
@@ -39,30 +40,19 @@ export default class ChattingScreen extends Component {
       cursorIndex:0,
     };
 
+    // 初始化聊天记录
     ConversationUtil.getConversations("hongwang", (data) => {
       console.log(JSON.stringify(data));
       if (data != null && data.length !==0) {
-        this.setState({conversation: data, messagessss: data[0].messages});
+        this.setState({conversation: data, messagessss: data[0].messages}, ()=>{
+          this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 1000);
+        });
         console.log(this.state.messagessss);
       }
     })
   }
 
   componentWillMount() {
-
-    CountEmitter.addListener('notifyChattingRefresh', () => {
-      // 刷新消息
-      ConversationUtil.getConversations("hongwang", (data) => {
-        if (data != null) {
-          this.setState({conversation: data, messagessss: data.messagessss}, ()=>{
-            console.log('result: ' + JSON.stringify(data).toString());
-            this.scroll();
-          });
-        }
-      });
-
-    });
-
     this.createAccount();
     this.receiveTextMessage();
     this.receiveImageMessage();
@@ -70,10 +60,11 @@ export default class ChattingScreen extends Component {
 
   componentDidMount() {
     //获取通道信息
-    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBack)
+    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBack) ;
+    DeviceEventEmitter.addListener('onResume', (e) => {
+      this.scroll();
+    })
   }
-
-
 
   /**
    * 设置账号，注册
@@ -114,7 +105,7 @@ export default class ChattingScreen extends Component {
 
   receiveImageMessage = () => {
     DeviceEventEmitter.addListener('receiveImageMessage', (e) => {
-      console.log("receiveImageMessage: " + e);
+      console.log("receiveImageMessage: " + e.imageWidth + "-------" + e.imageHeight);
       if (Utils.isEmpty(e)) {
         return;
       }
@@ -190,7 +181,7 @@ export default class ChattingScreen extends Component {
     console.log("isLogin: " + sendMessage.sendMessages);
 
     // 还需要将本条消息添加到当前会话中
-    this.concatMessage({
+    this.concatImageMessage({
       'conversationId':ConversationUtil.generateConversationId("hongwang", "hongwang"),
       'id': sendMessage.sendMessages,
       'receiveMessage': "",
@@ -201,16 +192,14 @@ export default class ChattingScreen extends Component {
       'messageType': 'image'
     })
   }
-  
+
   scroll() {
-    console.log("scroll----------------");
-    this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 0);
+    this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 200);
   }
 
   concatMessage(message) {
     ConversationUtil.addMessage(message, () => {
-      // 发送完消息，还要通知会话列表更新
-      CountEmitter.emit('notifyConversationListRefresh');
+
     });
     let msgs = this.state.messagessss;
     msgs.push(message);
@@ -218,6 +207,19 @@ export default class ChattingScreen extends Component {
     console.log("msgs result: " + JSON.stringify(msgs));
     this.setState({messagessss: msgs}, ()=>{
       this.scroll();
+    });
+  }
+
+  concatImageMessage(message) {
+    ConversationUtil.addMessage(message, () => {
+
+    });
+    let msgs = this.state.messagessss;
+    msgs.push(message);
+    console.log(msgs);
+    console.log("msgs result: " + JSON.stringify(msgs));
+    this.setState({messagessss: msgs}, ()=>{
+      this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 500);
     });
   }
 
@@ -278,7 +280,7 @@ export default class ChattingScreen extends Component {
 
   }
 
-  _keyExtractor = (item, index) => index
+  _keyExtractor = (item, index) => index.toString();
 
   shouldShowTime(item) { // 该方法判断当前消息是否需要显示时间
     let index = item.index;
@@ -305,14 +307,11 @@ export default class ChattingScreen extends Component {
     let emojiIndex = textContent.search(emojiReg);
 
     let checkIndexArray = [];
-    console.log("textContent: " + textContent) ;
     // 若匹配不到，则直接返回一个全文本
     if (emojiIndex === -1) {
-      console.log("emojiIndex === -1") ;
       Views.push(<Text key ={'emptyTextView'+(Math.random()*100)}>{textContent}</Text>);
 
     } else {
-      console.log("emojiIndex !== -1") ;
       if (emojiIndex !== -1) {
         checkIndexArray.push(emojiIndex);
       }
@@ -347,6 +346,10 @@ export default class ChattingScreen extends Component {
     this.setState({
       cursorIndex:event.nativeEvent.selection.start,
     });
+  }
+
+  test() {
+     Actions.hometest();
   }
 
   render() {
@@ -457,7 +460,7 @@ export default class ChattingScreen extends Component {
             <ZoomImage
               source={{uri: item.item.receiveMessage}}
               style={{borderRadius: 3}}
-              imgStyle={{width: 150, height: 150  * (item.item.attribute.imageHeight / item.item.attribute.imageWidth)}}
+              imgStyle={{width: 80, height: 80  * (item.item.attribute.imageHeight / item.item.attribute.imageWidth)}}
               enableScaling={true}
             />
           </View>
@@ -484,7 +487,7 @@ export default class ChattingScreen extends Component {
             <ZoomImage
               source={{uri: item.item.sendMessage}}
               style={{borderRadius: 3}}
-              imgStyle={{width: 150, height: 150  * (item.item.attribute.imageHeight / item.item.attribute.imageWidth)}}
+              imgStyle={{width: 80, height: 80  * (item.item.attribute.imageHeight / item.item.attribute.imageWidth)}}
               enableScaling={true}
             />
           </View>
@@ -556,6 +559,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   content: {
+    width:'100%',
     flex: 1,
     flexDirection: 'column',
     alignItems: 'flex-start',

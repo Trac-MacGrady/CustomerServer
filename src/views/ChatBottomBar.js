@@ -94,7 +94,7 @@ export default class ChatBottomBar extends Component {
                   {
                       Utils.isEmpty(this.state.inputMsg) ? (
                         <View style={{marginLeft: 10, marginRight:10}}>
-                          <Button color={'#bababf'} title={"发送"}/>
+                          <Button color={'#bababf'} title={"发送"} onPress={() => this.sendEmptyMsg()}/>
                         </View>
                       ) : (
                           <View style={{marginLeft: 10, marginRight:10}}>
@@ -131,65 +131,45 @@ export default class ChatBottomBar extends Component {
 
 
     _onEmojiSelected(code){
-
         if (code === '' ){
             return;
         }
 
-        console.log("code: " + code);
         let lastText = '';
         let currentTextLength = this.state.inputMsg.length;
-
         if (code === '/{del'){ //删除键
-
             if (currentTextLength === 0){
                 return;
             }
-
             if (this.state.cursorIndex < currentTextLength){ //光标在字符串中间
-
                 let emojiReg = new RegExp('\\[[^\\]]+\\]'); //表情符号正则表达式
-
                 let emojiIndex = this.state.inputMsg.search(emojiReg); //匹配到的第一个表情符位置
-
                 if (emojiIndex === -1){ //没有匹配到表情符
                     let preStr = this.state.inputMsg.substring(0,this.state.cursorIndex);
                     let nextStr = this.state.inputMsg.substring(this.state.cursorIndex);
                     lastText = preStr.substring(0,preStr.length - 1) + nextStr;
-
                     this.setState({
                         cursorIndex:preStr.length - 1,
                     });
-                }
-                else {
-
+                } else {
                     let preStr = this.state.inputMsg.substring(0,this.state.cursorIndex);
                     let nextStr = this.state.inputMsg.substring(this.state.cursorIndex);
-
                     let lastChar = preStr.charAt(preStr.length - 1);
                     if (lastChar === ']'){
-
                         let castArray = preStr.match(emojiReg);
-
                         if(!castArray){
                             let cast = castArray[castArray.length - 1];
-
                             lastText = preStr.substring(0,preStr.length - cast.length) + nextStr;
-
                             this.setState({
                                 cursorIndex:preStr.length - cast.length,
                             });
-                        }
-                        else{
+                        } else{
                             lastText = preStr.substring(0,preStr.length - 1) + nextStr;
-
                             this.setState({
                                 cursorIndex:preStr.length - 1,
                             });
                         }
-
                     } else {
-
                         lastText = preStr.substring(0,preStr.length - 1) + nextStr;
                         this.setState({
                             cursorIndex:preStr.length - 1,
@@ -197,32 +177,23 @@ export default class ChatBottomBar extends Component {
                     }
                 }
 
-            }
-            else {  //光标在字符串最后
-
+            } else {  //光标在字符串最后
                 let lastChar = this.state.inputMsg.charAt(currentTextLength - 1);
                 if (lastChar === ']'){
                     let castArray = this.state.inputMsg.match(emojiReg);
-
                     if(castArray){
                         let cast = castArray[castArray.length - 1];
                         lastText = this.state.inputMsg.substring(0,this.state.inputMsg.length - cast.length);
-
                         this.setState({
                             cursorIndex:this.state.inputMsg.length - cast.length,
                         });
-                    }
-                    else{
+                    } else{
                         lastText = this.state.inputMsg.substring(0,this.state.inputMsg.length - 1);
-
                         this.setState({
                             cursorIndex:this.state.inputMsg.length - 1,
                         });
                     }
-
-                }
-                else {
-
+                } else {
                     lastText = this.state.inputMsg.substring(0,currentTextLength - 1);
                     this.setState({
                         cursorIndex:currentTextLength - 1,
@@ -230,23 +201,16 @@ export default class ChatBottomBar extends Component {
                 }
             }
 
-
-        }
-        else {
-
+        } else {
             if (this.state.cursorIndex >= currentTextLength) {
                 lastText = this.state.inputMsg + EMOTIONS_ZHCN[code];
-
                 this.setState({
                     cursorIndex:lastText.length
                 });
-
-            }
-            else {
+            } else {
                 let preTemp = this.state.inputMsg.substring(0,this.state.cursorIndex);
                 let nextTemp = this.state.inputMsg.substring(this.state.cursorIndex,currentTextLength);
                 lastText = preTemp + EMOTIONS_ZHCN[code] + nextTemp;
-
                 this.setState({
                     cursorIndex:this.state.cursorIndex + EMOTIONS_ZHCN[code].length
                 });
@@ -257,11 +221,9 @@ export default class ChatBottomBar extends Component {
             inputMsg:lastText,
         });
         this._onInputChangeText(lastText);
-
     }
 
     _onInputChangeText(text){
-
         //设值
         this.setState({
             inputMsg:text,
@@ -270,11 +232,14 @@ export default class ChatBottomBar extends Component {
     }
 
     _onSelectionChange(event){
-
         this.setState({
             cursorIndex:event.nativeEvent.selection.start,
         });
     }
+
+  sendEmptyMsg() {
+    
+  }
 
   sendMsg() {
     let onSendBtnClickListener = this.props.handleSendBtnClick;

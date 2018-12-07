@@ -1,19 +1,10 @@
 package com.customerserver.customer;
 
-import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 
-import com.customerserver.common.CommonUtils;
 import com.customerserver.common.Constant;
-import com.customerserver.common.ImageCache;
-import com.customerserver.common.Preferences;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -22,16 +13,12 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.hyphenate.chat.ChatClient;
 import com.hyphenate.chat.ChatManager;
-import com.hyphenate.chat.EMFileMessageBody;
 import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.chat.Message;
 import com.hyphenate.helpdesk.model.ContentFactory;
 import com.hyphenate.helpdesk.model.VisitorInfo;
-import com.hyphenate.util.DensityUtil;
-import com.hyphenate.util.ImageUtils;
 
-import java.io.File;
 import java.util.List;
 
 /**
