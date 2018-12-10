@@ -136,13 +136,24 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
-    compile project(':react-native-image-crop-picker')
+//    compile project(':react-native-image-crop-picker')
 //    compile project(':realm')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     compile 'com.easemob:kefu-sdk-lite:1.1.8'
+    compile(name: 'react-native-image-crop-picker', ext: 'aar')
+
+    // 依赖 aar 包中的 依赖包
+    compile 'com.yalantis:ucrop:2.2.0-native'
+    compile 'id.zelory:compressor:2.1.0'
 }
 
 // Run this once to be able to run the application with BUCK
