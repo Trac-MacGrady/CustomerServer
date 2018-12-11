@@ -238,7 +238,7 @@ export default class ChatBottomBar extends Component {
     }
 
   sendEmptyMsg() {
-    
+
   }
 
   sendMsg() {
