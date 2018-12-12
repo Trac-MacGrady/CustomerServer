@@ -9,17 +9,18 @@
 
     <application
       android:name=".MainApplication"
-      android:label="@string/app_name">
+      android:label="@string/app_name"
+        android:theme="@android:style/Theme.Light.NoTitleBar">
       <activity
-        android:name=".MainActivity"
+        android:name=".CustomerActivity"
         android:label="@string/app_name"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
         android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
           android:screenOrientation="landscape">
-        <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--<category android:name="android.intent.category.LAUNCHER" />-->
-        <!--</intent-filter>-->
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>

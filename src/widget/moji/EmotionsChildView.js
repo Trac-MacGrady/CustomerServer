@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import {EMOTIONS_DATA} from './DataSource';
 
 let {width} = Dimensions.get('window');
-let itemWidth = width / 7;
+// let itemWidth = width / 7;    // 聊天框全屏时
+let itemWidth = (width - width/4 -20) / 7;
 
 export default class EmotionsChildView extends PureComponent {
 

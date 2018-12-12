@@ -5,7 +5,6 @@ import TimeUtils from '../utils/TimeUtil';
 import TimeUtil from '../utils/TimeUtil';
 import ChatBottomBar from '../views/ChatBottomBar';
 import StorageUtil from '../utils/StorageUtil';
-import CountEmitter from '../event/CountEmitter';
 import ConversationUtil from '../utils/ConversationUtil';
 
 import {
@@ -234,13 +233,6 @@ export default class ChattingScreen extends Component {
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBack)
     this.scrollTimeout && clearTimeout(this.scrollTimeout);
-    CountEmitter.removeListener('notifyChattingRefresh', ()=>{});
-    // 通知会话列表刷新未读数
-    if (this.conversationId) {
-      ConversationUtil.clearUnreadCount(this.conversationId, ()=>{
-        CountEmitter.emit('notifyConversationListRefresh');
-      })
-    }
   }
 
   _matchContentString(textContent){
@@ -312,7 +304,7 @@ export default class ChattingScreen extends Component {
     let checkIndexArray = [];
     // 若匹配不到，则直接返回一个全文本
     if (emojiIndex === -1) {
-      Views.push(<Text key ={'emptyTextView'+(Math.random()*100)}>{textContent}</Text>);
+      Views.push(<Text style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{textContent}</Text>);
 
     } else {
       if (emojiIndex !== -1) {
@@ -323,7 +315,7 @@ export default class ChattingScreen extends Component {
       let minIndex = Math.min(...checkIndexArray);
 
       // 将0-index部分返回文本
-      Views.push(<Text key ={'firstTextView'+(Math.random()*100)}>{textContent.substring(0, minIndex)}</Text>);
+      Views.push(<Text style={{color:'#000000'}} key ={'firstTextView'+(Math.random()*100)}>{textContent.substring(0, minIndex)}</Text>);
 
       // 将index部分作分别处理
       this._matchEmojiMessageString(Views, textContent.substring(minIndex));
@@ -507,7 +499,7 @@ export default class ChattingScreen extends Component {
 const listItemStyle = StyleSheet.create({
   container: {
     flex: 1,
-    width: width,
+    width: '100%',
     flexDirection: 'row',
     padding: 5,
   },
@@ -539,7 +531,7 @@ const listItemStyle = StyleSheet.create({
   },
   containerSend: {
     flex: 1,
-    width: width,
+    width: '100%',
     flexDirection: 'row',
     padding: 5,
     justifyContent: 'flex-end',
@@ -562,12 +554,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    // position:'absolute',
+    // right:0
   },
   content: {
     width:'100%',
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'flex-start',
+    // alignItems: 'flex-start',
     backgroundColor: Global.pageBackgroundColor,
     position: 'relative',
     bottom: 48,

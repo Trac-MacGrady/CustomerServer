@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.facebook.react.ReactActivity;
 
-public class MainActivity extends ReactActivity {
+public class CustomerActivity extends ReactActivity {
 
     /**
      * Returns the name of the main component registered from JavaScript.
