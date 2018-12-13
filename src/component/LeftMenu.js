@@ -41,12 +41,14 @@ export default class LeftMenu extends Component {
 
   _selectItem(item) {
     return (
-      <TouchableOpacity style={styles.itemTextView} onPress={() => {this._onClickItem(item)}}>
+      <View style={{justifyContent:'center', flex:1}}>
+        <TouchableOpacity style={styles.itemTextView} onPress={() => {this._onClickItem(item)}}>
+          <Text style={[styles.leftText , this.state.itemSelected === item && styles.itemSelectedColor]}  >
+            {item}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        <Text style={[styles.itemDefaultColor, this.state.itemSelected === item && styles.itemSelectedColor]}  >
-          {item}
-        </Text>
-      </TouchableOpacity>
     )
   }
   
@@ -69,12 +71,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   itemTextView: {
-    flex:1,
-    height: 30,
     width: window.width / 4,
     justifyContent: 'center',
-    borderBottomColor: 'gray',
-    borderBottomWidth: 1,
     marginLeft: 10,
     marginRight: 10,
 
@@ -89,6 +87,27 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   itemSelectedColor: {
-    color: '#00bfff'
-  }
+    backgroundColor: '#00bfff',
+    paddingLeft: 6,
+    paddingRight: 6,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderRadius: 3,
+    color: '#000000',
+    textAlign:'center', // 文字居中
+    fontSize: 15,
+  },
+
+  leftText: {
+    backgroundColor: '#D4D4D4',
+    paddingLeft: 6,
+    paddingRight: 6,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderRadius: 3,
+    color: '#000000',
+    // marginTop: 10,
+    textAlign:'center', // 文字居中
+    fontSize: 15,
+  },
 });
