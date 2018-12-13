@@ -188,22 +188,25 @@ export default class ChattingScreen extends Component {
 
             }
           <View style={styles.textContainer}>
-            <TextInput
-              ref="textInput"
-              style={styles.input}
-              underlineColorAndroid="transparent"
-              multiline = {true}
-              autoFocus={false}
-              editable={true}
-              placeholder={'请输入'}
-              placeholderTextColor={'#bababf'}
-              onChangeText={(text) => this._onInputChangeText(text)}
-              defaultValue={this.state.inputMsg}/>
-
-            <View style={{marginLeft: 10, marginRight:10}}>
-              <Button color={'#bababf'} title={"点击"} onPress={() => this.showHistory()}/>
+            <View style={styles.inputHistory}>
+              <TextInput
+                ref="textInput"
+                style={styles.input}
+                underlineColorAndroid="transparent"
+                multiline = {true}
+                autoFocus={false}
+                editable={true}
+                placeholder={'请输入'}
+                placeholderTextColor={'#bababf'}
+                onChangeText={(text) => this._onInputChangeText(text)}
+                defaultValue={this.state.inputMsg}/>
+              <View style={styles.iconHistory}>
+                <TouchableOpacity onPress={this.showHistory.bind(this)}>
+                  <Image source={require('../../images/ic_arrow_drop_down_black_24dp.png')} style={{width:30, height:30, }}/>
+                </TouchableOpacity>
+              </View>
             </View>
-
+            
             {
               Utils.isEmpty(this.state.inputMsg) ? (
                 <View style={{marginLeft: 10, marginRight:10}}>
@@ -445,7 +448,22 @@ const styles = StyleSheet.create({
     width:'100%',
     position:'absolute',
     bottom:0,
-
   },
+
+  inputHistory: {
+    flex:1,
+    paddingTop:8,
+    paddingBottom:8,
+    paddingLeft:10,
+    paddingRight:10,
+  },
+
+  iconHistory: {
+    width:60,
+    position:'absolute',
+    right:0,
+    paddingTop:8,
+    paddingBottom:8,
+  }
 
 });
