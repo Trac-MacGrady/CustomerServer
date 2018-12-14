@@ -82,7 +82,7 @@ export default class ChattingScreen extends Component {
   }
 
   sendEmptyMsg() {
-
+    
   }
 
   showHistory() {
@@ -166,6 +166,16 @@ export default class ChattingScreen extends Component {
     })
   }
 
+  /**
+   * 点击消息条目设置message给input
+   * @param item
+   */
+  showSendHistoryMsg(item) {
+    this.setState({
+      inputMsg:item.item.sendMessage,
+    });
+  }
+
   render() {
     return (
         <View style={styles.container}>
@@ -190,7 +200,7 @@ export default class ChattingScreen extends Component {
           <View style={styles.textContainer}>
             <View style={styles.inputHistory}>
               <TextInput
-                ref="textInput"
+                ref="textInputss"
                 style={styles.input}
                 underlineColorAndroid="transparent"
                 multiline = {true}
@@ -210,7 +220,7 @@ export default class ChattingScreen extends Component {
             {
               Utils.isEmpty(this.state.inputMsg) ? (
                 <View style={{marginLeft: 10, marginRight:10}}>
-                  <Button color={'#bababf'} title={"发送"} onPress={() => this.sendEmptyMsg()}/>
+                  <Button color={'#bababf'} title={"发送"} onPress={this.sendEmptyMsg.bind(this)}/>
                 </View>
               ) : (
                 <View style={{marginLeft: 10, marginRight:10}}>
@@ -222,7 +232,7 @@ export default class ChattingScreen extends Component {
           {this.state.showHistory &&
           <View style={{width:'100%', height:200}}>
             <FlatList
-              ref="flatList_history"
+              ref="flatlist_history"
               data={this.state.messagessss}
               renderItem={this.renderHistoryItem}
               keyExtractor={this._keyExtractor}
@@ -245,8 +255,8 @@ export default class ChattingScreen extends Component {
 
   renderHistoryItem = (item) => {
        return (
-         <TouchableOpacity>
-           <View style={listItemStyle.msgContainer}>
+         <TouchableOpacity onPress={()=>this.showSendHistoryMsg(item)}>
+           <View style={listItemStyle.msgHistorySend}>
              <View style={styles.mojicontainer}>
                <Text>{item.item.sendMessage}</Text>
              </View>
@@ -328,6 +338,18 @@ const listItemStyle = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 5,
   },
+
+  msgHistorySend: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 3,
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop:20,
+    paddingBottom:20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   msgContainerSend: {
     backgroundColor: '#9FE658',
     borderRadius: 3,
@@ -433,7 +455,7 @@ const styles = StyleSheet.create({
   input: {
     flex:1,
     paddingTop:8,
-    paddingBottom:8,
+    paddingBottom:5,
     paddingLeft:10,
     paddingRight:10,
     height:32,

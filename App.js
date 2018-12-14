@@ -10,7 +10,6 @@ import React, {Component} from 'react';
 import {StyleSheet} from 'react-native';
 import { Router, Scene, Tabs, ActionConst} from 'react-native-router-flux'
 import ChattingScreen from './src/component/ChattingScreen'
-import TabIcon from './src/widget/TabIcon'
 import Home from './src/component/Home'
 import LeftMenu from './src/component/LeftMenu'
 import KnowledgeJL from './src/component/KnowledgeJL'
