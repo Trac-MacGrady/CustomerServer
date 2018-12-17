@@ -177,6 +177,12 @@ export default class ChattingScreen extends Component {
   }
 
   render() {
+    var historyMessage = [];      // 截取最近5条问答历史
+    if (this.state.messagessss.length < 5) {
+      historyMessage = this.state.messagessss.slice(0, 5).reverse();
+    } else {
+      historyMessage = this.state.messagessss.slice(this.state.messagessss.length - 5, this.state.messagessss.length).reverse();
+    }
     return (
         <View style={styles.container}>
           <View style={styles.content}>
@@ -197,6 +203,23 @@ export default class ChattingScreen extends Component {
               </TouchableOpacity>
 
             }
+
+            {/* 是否显示历史提问框*/}
+            {this.state.showHistory &&
+            <View style={{width:'100%', alignItems:'center'}}>
+              <View style={{width:width- width / 4, height:200, backgroundColor:'#ffffff', marginBottom:10,  borderRadius: 6,}}>
+                <FlatList
+                  ref="flatlist_history"
+                  data={historyMessage}  // 历史记录只显示前5条数据
+                  renderItem={this.renderHistoryItem}
+                  keyExtractor={this._keyExtractor}
+                  extraData={this.state}
+                />
+              </View>
+            </View>}
+
+
+
           <View style={styles.textContainer}>
             <View style={styles.inputHistory}>
               <TextInput
@@ -212,7 +235,13 @@ export default class ChattingScreen extends Component {
                 defaultValue={this.state.inputMsg}/>
               <View style={styles.iconHistory}>
                 <TouchableOpacity onPress={this.showHistory.bind(this)}>
-                  <Image source={require('../../images/ic_arrow_drop_down_black_24dp.png')} style={{width:30, height:30, }}/>
+                  {
+                    this.state.showHistory ?
+                      <Image source={require('../../images/ic_arrow_drop_down_black_24dp.png')} style={{width:30, height:30, }}/>
+                      :
+                      <Image source={require('../../images/ic_arrow_drop_up_black_24dp.png')} style={{width:30, height:30, }}/>
+                  }
+
                 </TouchableOpacity>
               </View>
             </View>
@@ -229,16 +258,7 @@ export default class ChattingScreen extends Component {
               )
             }
           </View>
-          {this.state.showHistory &&
-          <View style={{width:'100%', height:200}}>
-            <FlatList
-              ref="flatlist_history"
-              data={this.state.messagessss}
-              renderItem={this.renderHistoryItem}
-              keyExtractor={this._keyExtractor}
-              extraData={this.state}
-            />
-          </View>}
+
         </View>
         </View>
 
@@ -340,13 +360,14 @@ const listItemStyle = StyleSheet.create({
   },
 
   msgHistorySend: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 3,
+    backgroundColor: '#E3FFE5',
+    borderRadius: 12,
     paddingLeft: 8,
     paddingRight: 8,
-    paddingTop:20,
-    paddingBottom:20,
+    paddingTop:10,
+    paddingBottom:10,
     justifyContent: 'center',
+   margin:5,
     alignItems: 'center',
   },
 
@@ -395,6 +416,8 @@ const styles = StyleSheet.create({
     width:'100%',
     flex: 1,
     flexDirection: 'column',
+    position: 'relative',
+    bottom: 48,
     // alignItems: 'flex-start',
     backgroundColor: Global.pageBackgroundColor,
   },
