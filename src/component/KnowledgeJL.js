@@ -37,10 +37,21 @@ export default class ChattingScreen extends Component {
       showHistory:false
     };
 
+    // 初始化聊天记录
+    ConversationUtil.getConversations("knowledge", (data) => {
+      console.log(JSON.stringify(data));
+      if (data != null && data.length !==0) {
+        this.setState({conversation: data, messagessss: data[0].messages}, ()=>{
+          this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 1000);
+        });
+        console.log(this.state.messagessss);
+      }
+    })
+
   }
 
   componentWillMount() {
-
+    StorageUtil.set('username', {'username': "knowledge"});
   }
 
   componentDidMount() {
@@ -96,7 +107,7 @@ export default class ChattingScreen extends Component {
     // console.log("isLogin: " + sendMessage.sendMessages);
     // 还需要将本条消息添加到当前会话中
     this.concatMessage({
-      'conversationId':ConversationUtil.generateConversationId("hongwang", "hongwang"),
+      'conversationId':ConversationUtil.generateConversationId("knowledge", "knowledge"),
       // 'id': sendMessage.sendMessages,
       'receiveMessage': "",
       'sendMessage': msg,
@@ -207,12 +218,13 @@ export default class ChattingScreen extends Component {
             {/* 是否显示历史提问框*/}
             {this.state.showHistory &&
             <View style={{width:'100%', alignItems:'center'}}>
-              <View style={{width:width- width / 4, height:200, backgroundColor:'#ffffff', marginBottom:10,  borderRadius: 6,}}>
+              <View style={{width:'100%', height:200, backgroundColor:'#ffffff', marginBottom:10,  borderRadius: 6,}}>
                 <FlatList
                   ref="flatlist_history"
                   data={historyMessage}  // 历史记录只显示前5条数据
                   renderItem={this.renderHistoryItem}
                   keyExtractor={this._keyExtractor}
+                  showsVerticalScrollIndicator = {false}    //隐藏垂直滚动条
                   extraData={this.state}
                 />
               </View>

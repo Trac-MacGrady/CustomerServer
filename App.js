@@ -28,7 +28,7 @@ class App extends Component {
                     <Scene key="chatting" component={ChattingScreen} hideNavBar={true}/>
                     <Scene key="home" component={Home} hideNavBar={true} initial={true}/>
                     <Scene key="leftmenu" component={LeftMenu} hideNavBar={true}/>
-                    <Scene key="knowledge" component={KnowledgeJL} hideNavBar={true}/>
+                    {/*<Scene key="knowledge" component={KnowledgeJL} hideNavBar={true} initial={true}/>*/}
                     <Scene key="recommend" component={Recommend} hideNavBar={true}/>
                 </Scene>
             </Router>
