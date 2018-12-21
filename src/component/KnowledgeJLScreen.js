@@ -3,7 +3,6 @@ import Global from '../utils/Global';
 import Utils from '../utils/Utils';
 import TimeUtils from '../utils/TimeUtil';
 import TimeUtil from '../utils/TimeUtil';
-import ChatBottomBar from '../views/ChatBottomBar';
 import StorageUtil from '../utils/StorageUtil';
 import ConversationUtil from '../utils/ConversationUtil';
 
@@ -16,9 +15,8 @@ import {
   Text,
   View,
   DeviceEventEmitter,
-  BackHandler, Button, TextInput, TouchableOpacity, WebView
+  BackHandler, Button, TextInput, TouchableOpacity
 } from 'react-native'
-import NativeDealMessage from '../native/NativeDealMessage'
 import HTMLView from 'react-native-htmlview';
 import HttpClient from '../network/HttpClient'
 import Toast from '../widget/Toast'
@@ -39,7 +37,7 @@ export default class ChattingScreen extends Component {
       tempSendTxtArray:[],
       cursorIndex:0,
       inputMsg:'',
-      showHistory:false
+      showHistory:false,
     };
 
     // 初始化聊天记录
@@ -98,7 +96,8 @@ export default class ChattingScreen extends Component {
   }
 
   sendTextMessage = async (msg) =>{ // 发送文本消息
-    let data = {'app':'hhw', 'ask':'【00001】月卡充值', 'user':'{"level":12,"vip":0,"uid":20996000001,"app_channel":"","sch":"弓箭手","iz":"蒲家村"}'};
+    // 模拟数据，【00004】为用户自定义输入
+    let data = {'app':'hhw', 'ask':'【00004】'+ msg, 'user':'{"level":12,"vip":0,"uid":20996000001,"app_channel":"","sch":"弓箭手","iz":"蒲家村"}'};
     // let data = {'app':'hhw', 'ask':'【system】精灵热点', 'user':'{"level":1,"vip":0,"uid":20996000001,"app_channel":"","sch":"弓箭手","iz":"蒲家村"}'};
     HttpClient.doPost(Host.ask, data, (code, response) => {
       switch (code) {
@@ -316,7 +315,7 @@ export default class ChattingScreen extends Component {
     let contactAvatar = require('../../images/avatar.png');
     let receiveMessage = item.item.receiveMessage.toString();
     if (receiveMessage.includes('<p')) {
-      receiveMessage = "<p>" + receiveMessage.replace(/<p/g, "<nobr").replace(/p>/g, "nobr>") + "</p>";  // 使用正则替换所有的字符，否则只替换第一个
+      receiveMessage = "<p>" + receiveMessage.replace(/<p/g, "<nobr").replace(/p>/g, "nobr>").replace("ui=", "href=") + "</p>";  // 使用正则替换所有的字符，否则只替换第一个
       console.log("============" + receiveMessage)
     }
     
@@ -339,12 +338,29 @@ export default class ChattingScreen extends Component {
               <HTMLView              // 显示后台返回的包含html标签的数据
                 value={receiveMessage}
                 stylesheet={styles}
+                onLinkPress={(url) => Toast.show(url, Toast.SHORT)}
               />
               {/*<Text style={{color:'#000000'}}>{item.item.receiveMessage}</Text>*/}
             </View>
-          </View>
+            {/* 显示是否解决问题菜单*/}
+            <View style={{width:'100%', marginTop:8, flexDirection:'row',height:40, justifyContent: 'flex-end', alignItems:'center', backgroundColor:'#F9FFB1'}}>
+              <Text style={{position:'absolute', left:5, fontSize:13}}>此次回答是否解决了你的问题</Text>
+              <View  style={{flexDirection:'row'}}>
+                <View style={{marginRight:5}}>
+                  <Button color={'#49BC1C'} title={"未解决"}/>
+                </View>
+                <View style={{marginRight:5}}>
+                  <Button  color={'#49BC1C'} title={"解决"}/>
+                </View>
+                <View>
+                  <Button color={'#49BC1C'} title={"工单"}/>
+                </View>
+              </View>
+            </View>
+
           </View>
         </View>
+      </View>
       </View>
     );
   }
@@ -376,20 +392,6 @@ export default class ChattingScreen extends Component {
       </View>
     );
   }
-
-  _matchKnowledgeMessage(Views, knowledgeMessage) {
-      if (knowledgeMessage.startsWith('["<a')) {
-           for (let a = 0; a < knowledgeMessage.length; a++ ) {
-             if (knowledgeMessage[a].startsWith("<a")) {
-               Views.push(<Button style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{knowledgeMessage[a]}</Button>)
-             } else {
-               Views.push(<Text style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{knowledgeMessage[a]}</Text>)
-             }
-        }
-      } else {
-        Views.push(<Text style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{knowledgeMessage}</Text>)
-      }
-  }
 }
 
 
@@ -407,7 +409,6 @@ const listItemStyle = StyleSheet.create({
   msgContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 3,
-    padding:10,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 5,
@@ -521,6 +522,9 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     flexWrap:'wrap',
+    paddingTop:10,
+    paddingLeft:10,
+    paddingRight:10,
   },
 
   subEmojiStyle:{

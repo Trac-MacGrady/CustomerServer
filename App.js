@@ -8,28 +8,28 @@
 
 import React, {Component} from 'react';
 import {StyleSheet} from 'react-native';
-import { Router, Scene, Tabs, ActionConst} from 'react-native-router-flux'
-import ChattingScreen from './src/component/ChattingScreen'
+import { Router, Scene} from 'react-native-router-flux'
+import CustomerChattingScreen from './src/component/CustomerChattingScreen'
 import Home from './src/component/Home'
 import LeftMenu from './src/component/LeftMenu'
-import KnowledgeJL from './src/component/KnowledgeJL'
-import Recommend from './src/component/Recommend'
+import RecommendScreen from './src/component/RecommendScreen'
+import KnowledgeJL from './src/component/KnowledgeJLScreen'
 
 class App extends Component {
     componentDidMount() {
-
     }
+
 
     render() {
 
         return (
             <Router>
                 <Scene  key={'root'}>
-                    <Scene key="chatting" component={ChattingScreen} hideNavBar={true}/>
+                    <Scene key="chatting" component={CustomerChattingScreen} hideNavBar={true}/>
                     <Scene key="home" component={Home} hideNavBar={true} initial={true}/>
                     <Scene key="leftmenu" component={LeftMenu} hideNavBar={true}/>
-                    {/*<Scene key="knowledge" component={KnowledgeJL} hideNavBar={true} initial={true}/>*/}
-                    <Scene key="recommend" component={Recommend} hideNavBar={true}/>
+                    <Scene key="knowledge" component={KnowledgeJL} hideNavBar={true}/>
+                    <Scene key="recommend" component={RecommendScreen} hideNavBar={true}/>
                 </Scene>
             </Router>
         );

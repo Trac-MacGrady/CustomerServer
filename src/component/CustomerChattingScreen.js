@@ -28,7 +28,7 @@ const {width} = Dimensions.get('window');
 const {height} = Dimensions.get('window');
 let emojiReg = new RegExp('\\[[^\\]]+\\]','g'); //表情符号正则表达式
 
-export default class ChattingScreen extends Component {
+export default class CustomerChattingScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -61,7 +61,7 @@ export default class ChattingScreen extends Component {
     //获取通道信息
     BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBack) ;
     DeviceEventEmitter.addListener('onResume', (e) => {
-      this.scroll();
+      // this.scroll();
     })
   }
 
@@ -334,17 +334,6 @@ export default class ChattingScreen extends Component {
     }
     this._matchContentMessageString(Views, emojiStr.substring(emojiLength));
 
-  }
-
-  _onSelectionChange(event){
-
-    this.setState({
-      cursorIndex:event.nativeEvent.selection.start,
-    });
-  }
-
-  test() {
-     Actions.hometest();
   }
 
   render() {

@@ -9,7 +9,7 @@ import {
 const window = Dimensions.get('window');
 
 
-export default class Recommend extends Component {
+export default class RecommendScreen extends Component {
 
 
   constructor(props) {

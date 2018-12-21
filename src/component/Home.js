@@ -7,9 +7,9 @@ import {
 } from 'react-native';
 
 import LeftMenu from './LeftMenu.js';
-import ChattingScreen from './ChattingScreen'
-import KnowledgeJL from './KnowledgeJL'
-import Recommend from './Recommend'
+import CustomerChattingScreen from './CustomerChattingScreen'
+import KnowledgeJL from './KnowledgeJLScreen'
+import RecommendScreen from './RecommendScreen'
 //导入 菜单 组件
 
 
@@ -35,7 +35,7 @@ export default class Home extends Component {
     var showView = [];
     if (this.state.showRightContant === '热点推荐') {
       showView.push(
-        <Recommend/>
+        <RecommendScreen/>
       )
     }
 
@@ -47,7 +47,7 @@ export default class Home extends Component {
 
     if (this.state.showRightContant === '人工客服') {
       showView.push(
-        <ChattingScreen/>
+        <CustomerChattingScreen/>
       )
     }
 
