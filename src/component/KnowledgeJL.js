@@ -16,9 +16,14 @@ import {
   Text,
   View,
   DeviceEventEmitter,
-  BackHandler, Button, TextInput, TouchableOpacity
+  BackHandler, Button, TextInput, TouchableOpacity, WebView
 } from 'react-native'
 import NativeDealMessage from '../native/NativeDealMessage'
+import HTMLView from 'react-native-htmlview';
+import HttpClient from '../network/HttpClient'
+import Toast from '../widget/Toast'
+import HttpCode from '../network/HttpCode'
+import Host from "../network/Config";
 
 const {width} = Dimensions.get('window');
 const {height} = Dimensions.get('window');
@@ -59,26 +64,16 @@ export default class ChattingScreen extends Component {
     BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBack) ;
   }
 
-  receiveTextMessage = () => {
-    DeviceEventEmitter.addListener('receiveTextMessage', (e) => {
-      console.log("receiveTextMessage: " + e.textMessage + "======" + e.messageId);
-      if (Utils.isEmpty(e)) {
-        return;
-      }
-
-      let message  = e.textMessage;
-      let meesageId  = e.messageId;
+  receiveTextMessage = (msg) => {
 
       this.concatMessage({
-        'conversationId':ConversationUtil.generateConversationId("hongwang", "hongwang"),
-        'id': meesageId,
-        'receiveMessage': message,
+        'conversationId':ConversationUtil.generateConversationId("knowledge", "knowledge"),
+        'receiveMessage': msg,
         'sendMessage': "",
         'messageTime': TimeUtil.currentTime(),
         'messageState': "receive",
         'messageType': 'txt'
       })
-    });
   }
 
   /**
@@ -103,8 +98,28 @@ export default class ChattingScreen extends Component {
   }
 
   sendTextMessage = async (msg) =>{ // 发送文本消息
-    // let sendMessage = await NativeDealMessage.sendTextMessage(msg);
-    // console.log("isLogin: " + sendMessage.sendMessages);
+    let data = {'app':'hhw', 'ask':'【00001】月卡充值', 'user':'{"level":12,"vip":0,"uid":20996000001,"app_channel":"","sch":"弓箭手","iz":"蒲家村"}'};
+    // let data = {'app':'hhw', 'ask':'【system】精灵热点', 'user':'{"level":1,"vip":0,"uid":20996000001,"app_channel":"","sch":"弓箭手","iz":"蒲家村"}'};
+    HttpClient.doPost(Host.ask, data, (code, response) => {
+      switch (code) {
+        case HttpCode.SUCCESS:
+          let codeStatus = response.code;
+          if (codeStatus === 0) {
+            console.log("successful" + JSON.stringify(response.result.result));
+            this.receiveTextMessage(response.result.result);
+          } else {
+            Toast.show(response.msg, Toast.SHORT);
+          }
+          break;
+        case HttpCode.ERROR:
+          Toast.show("网络问题，请重试", Toast.SHORT);
+          console.log("http请求失败");
+          break;
+        default:
+          break;
+      }
+    });
+
     // 还需要将本条消息添加到当前会话中
     this.concatMessage({
       'conversationId':ConversationUtil.generateConversationId("knowledge", "knowledge"),
@@ -299,6 +314,12 @@ export default class ChattingScreen extends Component {
 
   renderReceivedTextMsg(item) { // 接收的文本消息
     let contactAvatar = require('../../images/avatar.png');
+    let receiveMessage = item.item.receiveMessage.toString();
+    if (receiveMessage.includes('<p')) {
+      receiveMessage = "<p>" + receiveMessage.replace(/<p/g, "<nobr").replace(/p>/g, "nobr>") + "</p>";  // 使用正则替换所有的字符，否则只替换第一个
+      console.log("============" + receiveMessage)
+    }
+    
     // if (!Utils.i sEmpty(this.chatWithAvatar)) {
     //   contactAvatar = this.chatWithAvatar;
     // }
@@ -312,10 +333,16 @@ export default class ChattingScreen extends Component {
 
         <View style={listItemStyle.container}>
           <Image style={listItemStyle.avatar} source={contactAvatar}/>
+          <View style={{width: '80%',alignItems: 'flex-start', justifyContent: 'center',}}>
           <View style={listItemStyle.msgContainer}>
             <View style={styles.mojicontainer}>
-              <Text style={{color:'#000000'}}>{item.item.receiveMessage}</Text>
+              <HTMLView              // 显示后台返回的包含html标签的数据
+                value={receiveMessage}
+                stylesheet={styles}
+              />
+              {/*<Text style={{color:'#000000'}}>{item.item.receiveMessage}</Text>*/}
             </View>
+          </View>
           </View>
         </View>
       </View>
@@ -324,7 +351,6 @@ export default class ChattingScreen extends Component {
 
   renderSendTextMsg(item) { // 发送出去的文本消息
     let avatar = require('../../images/avatar.png');
-    let Views = []
     // if (!Utils.isEmpty(this.state.userInfo.avatar)) {
     //   avatar = {uri: this.state.userInfo.avatar};
     // }
@@ -337,15 +363,32 @@ export default class ChattingScreen extends Component {
           ) : (null)
         }
         <View style={listItemStyle.containerSend}>
-          <View style={listItemStyle.msgContainerSend}>
-            <View style={styles.mojicontainer}>
-              <Text style={{color:'#000000'}}>{item.item.sendMessage}</Text>
+          <View style={{width: '80%',alignItems: 'flex-end', justifyContent: 'center',}}>
+            <View style={listItemStyle.msgContainerSend}>
+              <View style={styles.mojicontainer}>
+                <Text style={{color:'#000000'}}>{item.item.sendMessage}</Text>
+              </View>
             </View>
           </View>
+
           <Image style={listItemStyle.avatar} source={avatar}/>
         </View>
       </View>
     );
+  }
+
+  _matchKnowledgeMessage(Views, knowledgeMessage) {
+      if (knowledgeMessage.startsWith('["<a')) {
+           for (let a = 0; a < knowledgeMessage.length; a++ ) {
+             if (knowledgeMessage[a].startsWith("<a")) {
+               Views.push(<Button style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{knowledgeMessage[a]}</Button>)
+             } else {
+               Views.push(<Text style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{knowledgeMessage[a]}</Text>)
+             }
+        }
+      } else {
+        Views.push(<Text style={{color:'#000000'}} key ={'emptyTextView'+(Math.random()*100)}>{knowledgeMessage}</Text>)
+      }
   }
 }
 
@@ -364,8 +407,7 @@ const listItemStyle = StyleSheet.create({
   msgContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 3,
-    paddingLeft: 8,
-    paddingRight: 8,
+    padding:10,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 5,
@@ -386,8 +428,7 @@ const listItemStyle = StyleSheet.create({
   msgContainerSend: {
     backgroundColor: '#9FE658',
     borderRadius: 3,
-    paddingLeft: 8,
-    paddingRight: 8,
+    padding:10,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 5,
@@ -521,6 +562,11 @@ const styles = StyleSheet.create({
     right:0,
     paddingTop:8,
     paddingBottom:8,
-  }
+  },
 
+  // 标签样式
+  nobr: {
+    fontWeight: '300',
+    color: '#8b00ff', // make links coloured pink
+  },
 });

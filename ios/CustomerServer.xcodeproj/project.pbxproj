@@ -41,6 +41,7 @@
 		5FADC4D8A1094170BABB72A8 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A1503FA62034AB4A57D0E3C /* libc++.tbd */; };
 		72DE600894F54940B58DAF3E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 039B4F031D3E4E268BA00477 /* libz.tbd */; };
 		7B30FD9573014D35870AA351 /* libimageCropPicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8866F49B84E24FF184FED39F /* libimageCropPicker.a */; };
+		16291BBEA730415188505056 /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB5C12D6160456F859DC93B /* libRNFetchBlob.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -352,6 +353,8 @@
 		039B4F031D3E4E268BA00477 /* libz.tbd */ = {isa = PBXFileReference; name = "libz.tbd"; path = "usr/lib/libz.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
 		AF5391D6C25F4E21A762ABEA /* imageCropPicker.xcodeproj */ = {isa = PBXFileReference; name = "imageCropPicker.xcodeproj"; path = "../node_modules/react-native-image-crop-picker/ios/imageCropPicker.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		8866F49B84E24FF184FED39F /* libimageCropPicker.a */ = {isa = PBXFileReference; name = "libimageCropPicker.a"; path = "libimageCropPicker.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		0F4D83B8F61548B190443AC3 /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; name = "RNFetchBlob.xcodeproj"; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		ABB5C12D6160456F859DC93B /* libRNFetchBlob.a */ = {isa = PBXFileReference; name = "libRNFetchBlob.a"; path = "libRNFetchBlob.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -383,6 +386,7 @@
 				5FADC4D8A1094170BABB72A8 /* libc++.tbd in Frameworks */,
 				72DE600894F54940B58DAF3E /* libz.tbd in Frameworks */,
 				7B30FD9573014D35870AA351 /* libimageCropPicker.a in Frameworks */,
+				16291BBEA730415188505056 /* libRNFetchBlob.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,6 +577,7 @@
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				532E235442724CF2868B3DFF /* RealmReact.xcodeproj */,
 				AF5391D6C25F4E21A762ABEA /* imageCropPicker.xcodeproj */,
+				0F4D83B8F61548B190443AC3 /* RNFetchBlob.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1202,11 +1207,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Debug;
@@ -1230,11 +1237,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Release;
@@ -1259,6 +1268,7 @@
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Debug;
@@ -1282,6 +1292,7 @@
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Release;
@@ -1313,11 +1324,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Debug;
@@ -1349,11 +1362,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Release;
@@ -1384,11 +1399,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Debug;
@@ -1419,11 +1436,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\realm\src/**",
 					"$(SRCROOT)\..\node_modules\react-native-image-crop-picker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-fetch-blob\ios/**",
 				);
 			};
 			name = Release;
