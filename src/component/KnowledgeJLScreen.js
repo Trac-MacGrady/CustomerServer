@@ -38,14 +38,17 @@ export default class ChattingScreen extends Component {
       cursorIndex:0,
       inputMsg:'',
       showHistory:false,
+      sendMessages:[],
+      itemIndex:-1,
+      clickMuenu: false
     };
 
     // 初始化聊天记录
-    ConversationUtil.getConversations("knowledge", (data) => {
+    ConversationUtil.getConversations("sendMessage", (data) => {
       console.log(JSON.stringify(data));
       if (data != null && data.length !==0) {
-        this.setState({conversation: data, messagessss: data[0].messages}, ()=>{
-          this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 1000);
+        this.setState({conversation: data, sendMessages: data[0].messages}, ()=>{
+          // this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 1000);
         });
         console.log(this.state.messagessss);
       }
@@ -70,7 +73,10 @@ export default class ChattingScreen extends Component {
         'sendMessage': "",
         'messageTime': TimeUtil.currentTime(),
         'messageState': "receive",
-        'messageType': 'txt'
+        'messageType': 'txt',
+        'questionDes': '此次回答是否解决了你的问题',
+        'noDeal': 'true',
+        'deal': 'true'
       })
   }
 
@@ -83,6 +89,27 @@ export default class ChattingScreen extends Component {
     this.setState({
       inputMsg:'',
     })
+    this.setState({
+      showHistory: false,
+    })
+  }
+
+  noDeal (item){
+    item.item.questionDes = "小精灵再努力研究一下";
+    item.item.noDeal = 'false';
+    item.item.deal = 'false';
+    this.setState({clickMuenu: true})
+  }
+
+  deal (item){
+    item.item.questionDes = "感谢您对小精灵的支持";
+    item.item.noDeal = 'false';
+    item.item.deal = 'false';
+    this.setState({clickMuenu: true})
+  }
+
+  workOlder() {
+    Toast.show("工单", Toast.SHORT);
   }
 
   sendEmptyMsg() {
@@ -119,6 +146,7 @@ export default class ChattingScreen extends Component {
       }
     });
 
+    console.log("---------------------");
     // 还需要将本条消息添加到当前会话中
     this.concatMessage({
       'conversationId':ConversationUtil.generateConversationId("knowledge", "knowledge"),
@@ -129,16 +157,34 @@ export default class ChattingScreen extends Component {
       'messageState': "send",
       'messageType': 'txt'
     })
+
+    // 添加到已发送message列表中
+    this.addMessageList({
+      'conversationId':ConversationUtil.generateConversationId("sendMessage", "sendMessage"),
+      'message': msg,
+    })
+
   }
 
   scroll() {
     this.scrollTimeout = setTimeout(() => this.refs.flatList.scrollToEnd(), 200);
   }
 
-  concatMessage(message) {
+  addMessageList(message) {
     ConversationUtil.addMessage(message, () => {
-
+      
     });
+
+    let msgs = this.state.sendMessages;
+    msgs.push(message)
+    this.setState({sendMessages: msgs})
+  }
+
+  concatMessage(message) {
+    // 添加到消息记录中
+    // ConversationUtil.addMessage(message, () => {
+    //
+    // });
     let msgs = this.state.messagessss;
     msgs.push(message);
     console.log(msgs);
@@ -197,16 +243,16 @@ export default class ChattingScreen extends Component {
    */
   showSendHistoryMsg(item) {
     this.setState({
-      inputMsg:item.item.sendMessage,
+      inputMsg:item.item.message,
     });
   }
 
   render() {
     var historyMessage = [];      // 截取最近5条问答历史
-    if (this.state.messagessss.length < 5) {
-      historyMessage = this.state.messagessss.slice(0, 5).reverse();
+    if (this.state.sendMessages.length < 5) {
+      historyMessage = this.state.sendMessages.slice(0, 5).reverse();
     } else {
-      historyMessage = this.state.messagessss.slice(this.state.messagessss.length - 5, this.state.messagessss.length).reverse();
+      historyMessage = this.state.sendMessages.slice(this.state.sendMessages.length - 5, this.state.sendMessages.length).reverse();
     }
     return (
         <View style={styles.container}>
@@ -304,7 +350,7 @@ export default class ChattingScreen extends Component {
          <TouchableOpacity onPress={()=>this.showSendHistoryMsg(item)}>
            <View style={listItemStyle.msgHistorySend}>
              <View style={styles.mojicontainer}>
-               <Text>{item.item.sendMessage}</Text>
+               <Text>{item.item.message}</Text>
              </View>
            </View>
          </TouchableOpacity>
@@ -312,6 +358,7 @@ export default class ChattingScreen extends Component {
   }
 
   renderReceivedTextMsg(item) { // 接收的文本消息
+    let index = item.index;
     let contactAvatar = require('../../images/avatar.png');
     let receiveMessage = item.item.receiveMessage.toString();
     if (receiveMessage.includes('<p')) {
@@ -344,18 +391,41 @@ export default class ChattingScreen extends Component {
             </View>
             {/* 显示是否解决问题菜单*/}
             <View style={{width:'100%', marginTop:8, flexDirection:'row',height:40, justifyContent: 'flex-end', alignItems:'center', backgroundColor:'#F9FFB1'}}>
-              <Text style={{position:'absolute', left:5, fontSize:13}}>此次回答是否解决了你的问题</Text>
+              <Text style={{position:'absolute', left:5, fontSize:13}}>{item.item.questionDes}</Text>
+
               <View  style={{flexDirection:'row'}}>
-                <View style={{marginRight:5}}>
-                  <Button color={'#49BC1C'} title={"未解决"}/>
-                </View>
-                <View style={{marginRight:5}}>
-                  <Button  color={'#49BC1C'} title={"解决"}/>
-                </View>
+                {
+                  (item.item.noDeal === 'true') ? (
+                    <View style={{marginRight:5}}>
+                      <Button color={'#49BC1C'} title={"未解决"} onPress={() => this.noDeal(item)}/>
+                    </View>
+                  ) : (
+                    <View style={{marginRight:5}}>
+                      <Button color={'#666666'} title={"未解决"} disabled={true} onPress={() => this.sendEmptyMsg()}/>
+                    </View>
+                  )
+                }
+
+                {
+                  (item.item.deal === 'true') ? (
+                    <View style={{marginRight:5}}>
+                      <Button color={'#49BC1C'} title={"解决"} onPress={() => this.deal(item)}/>
+                    </View>
+                  ) : (
+                    <View style={{marginRight:5}}>
+                      <Button color={'#666666'} title={"解决"} disabled={true} onPress={() => this.sendEmptyMsg()}/>
+                    </View>
+                  )
+                }
+                
                 <View>
-                  <Button color={'#49BC1C'} title={"工单"}/>
+                  <Button color={'#49BC1C'} title={"工单"} onPress={() => this.workOlder()}/>
                 </View>
               </View>
+              {
+                this.state.clickMuenu &&
+                <Text>  </Text>
+              }
             </View>
 
           </View>
@@ -419,7 +489,6 @@ const listItemStyle = StyleSheet.create({
     borderRadius: 12,
     paddingLeft: 8,
     paddingRight: 8,
-    paddingTop:10,
     paddingBottom:10,
     justifyContent: 'center',
    margin:5,
@@ -429,7 +498,7 @@ const listItemStyle = StyleSheet.create({
   msgContainerSend: {
     backgroundColor: '#9FE658',
     borderRadius: 3,
-    padding:10,
+    paddingBottom:10,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 5,
