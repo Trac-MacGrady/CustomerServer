@@ -37,6 +37,13 @@ export default class CustomerChattingScreen extends Component {
       messagessss: [],
       tempSendTxtArray:[],
       cursorIndex:0,
+      // 用户信息
+      nickName : 'yunchang',
+      name : 'test',
+      qq : '66666',
+      phone : '18200000000',
+      companyName : 'yunchang',
+      email : 'sky@qq.com'
     };
 
     // 初始化聊天记录
@@ -159,8 +166,8 @@ export default class CustomerChattingScreen extends Component {
     this.state.tempSendTxtArray = [];
   }
 
-  sendTextMessage = async (msg) =>{ // 发送文本消息
-    let sendMessage = await NativeDealMessage.sendTextMessage(msg);
+  sendTextMessage = async (msg) =>{ // 发送文本消息     String nickName(区分各个账号), String name, String qq, String phone, String companyName, String email
+    let sendMessage = await NativeDealMessage.sendTextMessage(msg, this.state.nickName, this.state.name, this.state.qq, this.state.phone, this.state.companyName,this.state.email);
     console.log("isLogin: " + sendMessage.sendMessages);
     // 还需要将本条消息添加到当前会话中
     this.concatMessage({
@@ -184,7 +191,7 @@ export default class CustomerChattingScreen extends Component {
     let imageWidth = image.width;
     let imageHeight = image.height;
     console.log("imagePath: " + imagePath);
-    let sendMessage = await NativeDealMessage.sendImageMessage(imagePath);
+    let sendMessage = await NativeDealMessage.sendImageMessage(imagePath, this.state.nickName, this.state.name, this.state.qq, this.state.phone, this.state.companyName,this.state.email);
     console.log("isLogin: " + sendMessage.sendMessages);
 
     // 还需要将本条消息添加到当前会话中
@@ -390,10 +397,12 @@ export default class CustomerChattingScreen extends Component {
 
         <View style={listItemStyle.container}>
           <Image style={listItemStyle.avatar} source={contactAvatar}/>
+          <View style={{width: '80%',alignItems: 'flex-start', justifyContent: 'center',}}>
           <View style={listItemStyle.msgContainer}>
             <View style={styles.mojicontainer}>
               {Views}
             </View>
+          </View>
           </View>
         </View>
       </View>
@@ -416,10 +425,12 @@ export default class CustomerChattingScreen extends Component {
           ) : (null)
         }
         <View style={listItemStyle.containerSend}>
+          <View style={{width: '80%',alignItems: 'flex-end', justifyContent: 'center',}}>
           <View style={listItemStyle.msgContainerSend}>
             <View style={styles.mojicontainer}>
               {Views}
             </View>
+          </View>
           </View>
           <Image style={listItemStyle.avatar} source={avatar}/>
         </View>
@@ -597,6 +608,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     flexWrap:'wrap',
+    padding:10,
   },
 
   subEmojiStyle:{

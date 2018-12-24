@@ -47,10 +47,10 @@ public class DealMessageModule extends ReactContextBaseJavaModule {
      * 发送消息
      */
     @ReactMethod
-    public void sendTextMessage(String strMessage, Promise promise) {
+    public void sendTextMessage(String strMessage, String nickName, String name, String qq, String phone, String companyName, String email, Promise promise) {
         Message message = Message.createTxtSendMessage(strMessage, Constant.IM_SERVICE_NUMBER);
         String sendMessageId = message.getMsgId();
-        message.addContent(createVisitorInfo());
+        message.addContent(createVisitorInfo(nickName, name, qq, phone, companyName, email));
         ChatClient.getInstance().chatManager().sendMessage(message);
         WritableMap map = Arguments.createMap();
         map.putString("sendMessages",sendMessageId);
@@ -61,29 +61,29 @@ public class DealMessageModule extends ReactContextBaseJavaModule {
      * 发送图片消息
      */
     @ReactMethod
-    public void sendImageMessage(String imagePath, Promise promise) {
+    public void sendImageMessage(String imagePath, String nickName, String name, String qq, String phone, String companyName, String email, Promise promise) {
         if (imagePath.startsWith("file:///storage/emulated/0")) {
             imagePath = Environment.getExternalStorageDirectory().getPath() + imagePath.substring(26);
         }
         Message message = Message.createImageSendMessage(imagePath, false, Constant.IM_SERVICE_NUMBER);
         Log.d(TAG, "message: " + message);
          String sendMessageId = message.getMsgId();
-        message.addContent(createVisitorInfo());
+        message.addContent(createVisitorInfo(nickName, name, qq, phone, companyName, email));
         ChatClient.getInstance().chatManager().sendMessage(message);
         WritableMap map = Arguments.createMap();
         map.putString("sendMessages",sendMessageId);
         promise.resolve(map);
     }
 
-    private VisitorInfo createVisitorInfo() {
+    private VisitorInfo createVisitorInfo(String nickName, String name, String qq, String phone, String companyName, String email) {
         VisitorInfo info = ContentFactory.createVisitorInfo(null);
-        info.nickName("wanghong")
-                .name("hwnag")
-                .qq("10000")
-                .phone("15811200000")
-                .companyName("easemob")
+        info.nickName(nickName)
+                .name(name)
+                .qq(qq)
+                .phone(phone)
+                .companyName(companyName)
                 .description("")
-                .email("abc@123.com");
+                .email(email);
         return info;
     }
 
