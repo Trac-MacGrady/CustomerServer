@@ -13,7 +13,7 @@ import CustomerChattingScreen from './src/component/CustomerChattingScreen'
 import Home from './src/component/Home'
 import LeftMenu from './src/component/LeftMenu'
 import RecommendScreen from './src/component/RecommendScreen'
-import KnowledgeJL from './src/component/KnowledgeJLScreen'
+import KnowledgeJLScreen from './src/component/KnowledgeJLScreen'
 
 class App extends Component {
     componentDidMount() {
@@ -28,7 +28,7 @@ class App extends Component {
                     <Scene key="chatting" component={CustomerChattingScreen} hideNavBar={true}/>
                     <Scene key="home" component={Home} hideNavBar={true} initial={true}/>
                     <Scene key="leftmenu" component={LeftMenu} hideNavBar={true}/>
-                    <Scene key="knowledge" component={KnowledgeJL} hideNavBar={true}/>
+                    <Scene key="knowledge" component={KnowledgeJLScreen} hideNavBar={true}/>
                     <Scene key="recommend" component={RecommendScreen} hideNavBar={true}/>
                 </Scene>
             </Router>

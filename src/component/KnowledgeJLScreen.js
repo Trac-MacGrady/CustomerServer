@@ -26,14 +26,13 @@ import Host from "../network/Config";
 const {width} = Dimensions.get('window');
 const {height} = Dimensions.get('window');
 
-export default class ChattingScreen extends Component {
+export default class  KnowledgeJLScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       conversation: null,
       isLoginServer:'',
       messagessss: [],
-      historyMessage:[],
       tempSendTxtArray:[],
       cursorIndex:0,
       inputMsg:'',
@@ -44,7 +43,7 @@ export default class ChattingScreen extends Component {
     };
 
     // 初始化聊天记录
-    ConversationUtil.getConversations("sendMessage", (data) => {
+    ConversationUtil.getConversations("sendMessage", (data) => {                                    
       console.log(JSON.stringify(data));
       if (data != null && data.length !==0) {
         this.setState({conversation: data, sendMessages: data[0].messages}, ()=>{
@@ -108,8 +107,14 @@ export default class ChattingScreen extends Component {
     this.setState({clickMuenu: true})
   }
 
-  workOlder() {
+  workOlder(item) {
     Toast.show("工单", Toast.SHORT);
+    console.log('item: ' + item.index);
+    // 转到客服页面
+    let onClickListener = this.props.workolder;
+    if (!Utils.isEmpty(onClickListener)) {
+      onClickListener(this.state.messagessss[item.index - 1].sendMessage);
+    }
   }
 
   sendEmptyMsg() {
@@ -250,7 +255,7 @@ export default class ChattingScreen extends Component {
   render() {
     var historyMessage = [];      // 截取最近5条问答历史
     if (this.state.sendMessages.length < 5) {
-      historyMessage = this.state.sendMessages.slice(0, 5).reverse();
+      historyMessage = this.state.sendMessages.slice(0, 5).reverse();      
     } else {
       historyMessage = this.state.sendMessages.slice(this.state.sendMessages.length - 5, this.state.sendMessages.length).reverse();
     }
@@ -419,7 +424,7 @@ export default class ChattingScreen extends Component {
                 }
                 
                 <View>
-                  <Button color={'#49BC1C'} title={"工单"} onPress={() => this.workOlder()}/>
+                  <Button color={'#49BC1C'} title={"工单"} onPress={() => this.workOlder(item)}/>
                 </View>
               </View>
               {

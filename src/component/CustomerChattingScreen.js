@@ -60,6 +60,7 @@ export default class CustomerChattingScreen extends Component {
 
   componentWillMount() {
     this.createAccount();
+    this.getHuanxinUserInfo();
     this.receiveTextMessage();
     this.receiveImageMessage();
   }
@@ -86,6 +87,24 @@ export default class CustomerChattingScreen extends Component {
       StorageUtil.set('password', {'password': "123456"});
     }
   };
+
+  /**
+   * 获取环信用户信息
+   * userInfo:包含user所以信息； String nickName(区分各个账号), String name, String qq, String phone, String companyName, String email
+   */
+  getHuanxinUserInfo() {
+    DeviceEventEmitter.addListener('userInfo', (e) => {
+          let nickName = e.nickName;
+          let name = e.name;
+          let qq = e.qq;
+          let phone = e.phone;
+          let companyName = e.companyName;
+          let email = e.email;
+
+          console.log(" nickName: " + nickName + " name: " + name + " qq: " + qq +" phone: " + phone +
+            " companyName: " + companyName + " email: " + email);
+    });
+  }
 
   receiveTextMessage = () => {
     DeviceEventEmitter.addListener('receiveTextMessage', (e) => {
